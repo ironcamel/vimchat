@@ -17,6 +17,7 @@ Vimchat can use a status icon in the system tray that will blink when you receiv
 * python-gtk2
 * python-notify
 * python-dns
+* growl (for OSX only)
 
 # Installation
 
@@ -43,6 +44,15 @@ Pressing \l while on a buddy entry in the buddy list will bring up the log files
 When you enter into insert mode from a chat window (for example by typing i), it will pop up a send buffer. In the send buffer you simply type your message and hit enter. Multiple lines can also be sent by typing the lines, then selecting what you want to send in visual mode and pressing enter.
 
 Typing \l will bring up a new tab containing log files for the current user. 
+
+# Growl Integration
+
+First install the growl notification system: http://growl.info/
+
+Then download the growl SDK from: http://growl.info/downloads_developers.php
+
+Finally navigate into the Bindings/python folder and run: 
+    sudo python setup.py install
 
 # Options
 
