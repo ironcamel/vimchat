@@ -1,5 +1,5 @@
-syn match vimChatMsg 	/^\[\d\d:\d\d].\{-}:/	contains=vimChatTime,vimChatMe
-syn match vimChatTime  	/\[\d\d:\d\d\]/			contained nextgroup=vimChatMe
+syn match vimChatMsg 	/^\[\d\d\(:\d\d\)\{0,2\}].\{-}:/	contains=vimChatTime,vimChatMe
+syn match vimChatTime  	/\[\d\d\(:\d\d\)\{0,2\}]/			contained nextgroup=vimChatMe
 syn match vimChatMe  	/Me:/		 			contained
 
 " Comment, Type, String, Statement

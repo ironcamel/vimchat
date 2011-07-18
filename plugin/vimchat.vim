@@ -25,6 +25,9 @@
 "   g:vimchat_otr = (0 or 1) default is 0
 "   g:vimchat_logotr = (0 or 1) default is 1
 "   g:vimchat_statusicon = (0 or 1) default is 1
+"   g:vimchat_blinktimeout = timeout in seconds default is -1
+"   g:vimchat_buddylistmaxwidth = max width of buddy list window default ''
+"   g:vimchat_timestampformat = format of the message timestamp default "[%H:%M]" 
 
 
 python <<EOF
@@ -65,7 +68,6 @@ except:
     pyotr_enabled = False
     pyotr_logging = False
 
-
 gtk_enabled = False
 if 'DISPLAY' in os.environ:
     try:
@@ -88,6 +90,8 @@ class VimChatScope:
     rosterFile = '/tmp/vimChatRoster'
     statusIcon = None
     lastMessageTime = 0
+    blinktimeout = -1
+    timeformat = "[%H:%M]"
 
     #{{{ init
     def init(self):
@@ -126,13 +130,8 @@ class VimChatScope:
             pyotr_enabled = False
             pyotr_logging = False
 
-        isStatusIcon = int(vim.eval('g:vimchat_statusicon'))
-        if isStatusIcon != 1:
-            self.gtk_enabled = False
-
-        if self.gtk_enabled:
-            self.statusIcon = self.StatusIcon()
-            self.statusIcon.start()
+        # Timestamp format
+        self.timeformat = vim.eval('g:vimchat_timestampformat')
 
         # Signon to accounts listed in .vimrc
         if vim.eval("exists('g:vimchat_accounts')") == '1':
@@ -149,6 +148,19 @@ class VimChatScope:
                     password = config.get('accounts', jid)
                     self._signOn(jid, password)
 
+        if len(self.accounts) and self.statusIcon == None:
+            isStatusIcon = int(vim.eval('g:vimchat_statusicon'))
+            if isStatusIcon != 1:
+                self.gtk_enabled = False
+            if self.gtk_enabled:
+                self.statusIcon = self.StatusIcon()
+                self.statusIcon.start()
+                self.blinktimeout = int(vim.eval('g:vimchat_blinktimeout'))
+
+    def stop(self):
+        if self.statusIcon != None:
+            self.statusIcon.stop()
+        self.signOffAll()
     #}}}
 
     #CLASSES
@@ -277,7 +289,7 @@ class VimChatScope:
         def still_secure(self, opdata=None, context=None, is_reply=0):
             # this is called when the OTR session was refreshed
             # (ie. new session keys have been created)
-            # is_reply will be 0 when we started we started that refresh, 
+            # is_reply will be 0 when we started that refresh, 
             #   1 when the contact started it
             try: 
                 connection = VimChat.accounts[context.accountname]
@@ -317,7 +329,6 @@ class VimChatScope:
     #}}}
     #{{{ class JabberConnection
     class JabberConnection(threading.Thread):
-
         #{{{ class Variables
         _roster = {}
         _chats = {}
@@ -332,6 +343,7 @@ class VimChatScope:
             self._roster = roster
             threading.Thread.__init__ ( self )
             self.jabber = jabberClient
+            self.online = 0
             self._protocol = 'xmpp'
         #}}}
         #{{{ run
@@ -344,18 +356,20 @@ class VimChatScope:
             RECV_BUF = 4096
             self.xmppS = self.jabber.Connection._sock
             socketlist = [self.xmppS]
-            online = 1
+            self.online = 1
 
             #set up otr
             self.otrSetup()
-
-            while online:
+            while self.online:
                 (i , o, e) = select.select(socketlist,[],[],1)
                 for each in i:
                     if each == self.xmppS:
                         self.jabber.Process(1)
                     else:
                         pass
+                time.sleep(1)
+        def stop(self):
+            self.online = 0
         #}}}
 
         #From Jabber Functions
@@ -716,21 +730,32 @@ class VimChatScope:
             # GTK StausIcon
             gtk.gdk.threads_init()
             self.status_icon = StatusIcon()
-            self.status_icon.set_from_file(os.path.expanduser(
-                '~/.vimchat/icon.gif'))
+            self.status_icon.set_from_file(os.path.expanduser('~/.vimchat/icon.gif'))
             self.status_icon.set_tooltip("VimChat")
             self.status_icon.set_visible(True)
             gtk.main()
         def blink(self, value):
             self.status_icon.set_blinking(value)
-    #}}}
 
+        def stop(self):
+            self.status_icon.set_visible(False)
+            gtk.main_quit()
+    #}}}
+    #{{{ class BlinkClearer
+    class BlinkClearer(threading.Thread):
+        def __init__(self, tt):
+            self.timeoutTime = tt
+            threading.Thread.__init__ ( self )
+        def run(self):
+            time.sleep(self.timeoutTime)
+            VimChat.clearNotify()
+    #}}}
     #CONNECTION FUNCTIONS
     #{{{ signOn
     def signOn(self):
         accounts = self.getAccountsFromConfig()
         if len(accounts) == 0:
-            print 'No acounts found in the vimchat config %s.'\
+            print 'No accounts found in the vimchat config %s.'\
                 % (self.configFilePath)
             return
         for account in accounts:
@@ -778,14 +803,13 @@ class VimChatScope:
         self.accounts[accountJid] = self.JabberConnection(
             self, jid, jabberClient, roster)
         self.accounts[accountJid].start()
-
         print "Connected with " + jid
     #}}}
     #{{{ signOff
     def signOff(self):
         accounts = self.accounts
         if len(accounts) == 0:
-            print 'No acounts found'
+            print 'No accounts found'
             return
         for account in accounts:
             print account
@@ -793,14 +817,30 @@ class VimChatScope:
             'input("Enter the account from the above list: ")')
         self._signOff(account)
     #}}}
+    #{{{ signOffAll
+    def signOffAll(self):
+        accounts = self.accounts
+        if len(accounts) == 0:
+            return
+        size=len(accounts)
+        while(size > 0):
+            account = accounts.keys()[0]
+            self._signOff(account)
+            if len(accounts) >= size:
+                print "Error while signing off"
+                break
+            else:
+                size=len(accounts)
+    #}}}
     #{{{ _signOff
     def _signOff(self, account):
         accounts = self.accounts
         if account in accounts:
             try:
                 accounts[account].disconnect()
+                accounts[account].stop()
                 del accounts[account]
-                print "Signed Off VimChat!"
+                print "%s was signed off of VimChat!" % (account)
             except:
                 print "Error signing off %s VimChat!" % (account)
                 print sys.exc_info()[0:2]
@@ -837,7 +877,7 @@ class VimChatScope:
     #}}}
     #{{{ getTimestamp
     def getTimestamp(self):
-        return time.strftime("[%H:%M]")
+        return time.strftime(self.timeformat)
     #}}}
     #{{{ getBufByName
     def getBufByName(self, name):
@@ -892,7 +932,6 @@ class VimChatScope:
             print e
             vim.command("new " + self.rosterFile)
 
-
         commands = """
         setlocal foldtext=VimChatFoldText()
         setlocal nowrap
@@ -901,11 +940,13 @@ class VimChatScope:
         nnoremap <buffer> <silent> <Leader>l :py VimChat.openLogFromBuddyList()<CR>
         nnoremap <buffer> <silent> B :py VimChat.toggleBuddyList()<CR>
         nnoremap <buffer> <silent> q :py VimChat.toggleBuddyList()<CR>
+        nnoremap <buffer> <silent> r :py VimChat.refreshBuddyList()<CR>
+        nnoremap <buffer> <silent> R :py VimChat.refreshBuddyList()<CR>
+        nnoremap <buffer> <silent> <Leader>n /{{{ (<CR>
         nnoremap <buffer> <silent> <Leader>c :py VimChat.openGroupChat()<CR>
         nnoremap <buffer> <silent> <Leader>ss :py VimChat.setStatus()<CR>
-        nnoremap <buffer> <silent> <Space> :silent exec 'vertical resize ' . (winwidth('.') > g:vimchat_buddylistwidth ? (g:vimchat_buddylistwidth) : '')<CR>
+        nnoremap <buffer> <silent> <Space> :silent exec 'vertical resize ' . (winwidth('.') > g:vimchat_buddylistwidth ? (g:vimchat_buddylistwidth) : (g:vimchat_buddylistmaxwidth))<CR>
         """
-
         vim.command(commands)
         self.setupLeaderMappings()
 
@@ -926,7 +967,6 @@ class VimChatScope:
             vim.command("normal [z")
 
             account = str(vim.current.line).split(' ')[2]
-
             return account, toJid
     #}}}
     #{{{ beginChatFromBuddyList
@@ -939,10 +979,14 @@ class VimChatScope:
             #print "Error getting buddy info: " + jid
             return 0
 
-
         vim.command('sbuffer ' + str(buf.number))
         VimChat.toggleBuddyList()
         vim.command('wincmd K')
+    #}}}
+    #{{{ refreshBuddyList
+    def refreshBuddyList(self):
+        self.writeBuddyList()
+        vim.command("silent e!")
     #}}}
     #{{{ writeBuddyList
     def writeBuddyList(self):
@@ -1001,7 +1045,6 @@ You can type \on to reconnect.
     #CHAT BUFFERS
     #{{{ beginChat
     def beginChat(self, fromAccount, toJid, groupChat = False):
-        #return 0
         #Set the ChatFile
         connection = self.accounts[fromAccount]
         if toJid in connection._chats.keys():
@@ -1013,7 +1056,6 @@ You can type \on to reconnect.
                 chatFile = 'chat:' + toJid
 
             connection._chats[toJid] = chatFile
-
         bExists = int(vim.eval('buflisted("' + chatFile + '")'))
         if bExists: 
             #TODO: Need to call sbuffer only if buffer is hidden.
@@ -1031,7 +1073,6 @@ You can type \on to reconnect.
             vim.command("let b:account = '" + fromAccount + "'")
             self.setupChatBuffer(groupChat);
             return vim.current.buffer
-
     #}}}
     #{{{ setupChatBuffer
     def setupChatBuffer(self, isGroupChat=False):
@@ -1124,10 +1165,10 @@ You can type \on to reconnect.
 
         #Get the first line
         if resource:
-            line = tstamp + secureString + \
+            line = tstamp + " " + secureString + \
                 user + "/" + resource + ": " + lines.pop(0);
         else:
-            line = tstamp + secureString + user + ": " + lines.pop(0);
+            line = tstamp + " " + secureString + user + ": " + lines.pop(0);
 
         buf.append(line)
         #TODO: remove these lines
@@ -1483,16 +1524,12 @@ You can type \on to reconnect.
         try:
             self.notify(jid, message, groupChat)
         except:
-            print 'Error zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz'
-            print 'could not notify:', message, 'from:', jid
+            print 'Could not notify:', message, 'from:', jid
     #}}}
     #{{{ notify
     def notify(self, jid, msg, groupChat):
-        # Important to keep this echo statement.  As a side effect, it
-        # refreshes the buffer so the new message shows up. Need to find
-        # a better solution though.
-        vim.command("echo 'Message Received from: " + jid.replace("'", "''")
-            + "'")
+        # refreshes the buffer so the new message shows up
+        vim.command("echo ");
 
         if groupChat:
             msgLowered = msg.lower()
@@ -1519,6 +1556,9 @@ You can type \on to reconnect.
 
         if self.gtk_enabled:
             self.statusIcon.blink(True)
+            if self.blinktimeout != -1:
+                thr1 = self.BlinkClearer(self.blinktimeout)
+                thr1.start()
     #}}}
     #{{{ clearNotify
     def clearNotify(self):
@@ -1616,6 +1656,7 @@ endif
 let g:vimchat_loaded = 1
 
 com! VimChat py VimChat.init() 
+com! VimChatStop py VimChat.stop() 
 com! VimChatBuddyList py VimChat.toggleBuddyList()
 com! VimChatViewLog py VimChat.openLogFromChat()
 com! VimChatJoinGroupChat py VimChat.openGroupChat()
@@ -1625,6 +1666,7 @@ com! VimChatOtrGenerateKey py VimChat.otrGenerateKey()
 com! -nargs=0 VimChatSetStatus py VimChat.setStatus(<args>)
 com! VimChatShowStatus py VimChat.showStatus()
 com! VimChatJoinChatroom py VimChat.joinChatroom()
+autocmd! VIMLeave * :VimChatStop
 
 set switchbuf=usetab
 
@@ -1633,6 +1675,9 @@ set switchbuf=usetab
 fu! VimChatCheckVars()
     if !exists('g:vimchat_buddylistwidth')
         let g:vimchat_buddylistwidth=30
+    endif
+    if !exists('g:vimchat_buddylistmaxwidth')
+        let g:vimchat_buddylistmaxwidth=''
     endif
     if !exists('g:vimchat_libnotify')
         let g:vimchat_libnotify=1
@@ -1652,6 +1697,12 @@ fu! VimChatCheckVars()
     if !exists('g:vimchat_statusicon')
         let g:vimchat_statusicon=1
     endif
+    if !exists('g:vimchat_blinktimeout')
+        let g:vimchat_blinktimeout=-1
+    endif
+    if !exists('g:vimchat_timestampformat')
+        let g:vimchat_timestampformat="[%H:%M]"
+    endif 
 
     return 1
 endfu
