@@ -76,6 +76,16 @@ if 'DISPLAY' in os.environ:
         gtk_enabled = True
     except:
         gtk_enabled = False
+
+growl_enabled = False
+try:
+    import Growl
+    from Growl import Image, GrowlNotifier
+    growl_enabled = True
+except:
+    growl_enabled = False
+
+
 #}}}
 
 #{{{ VimChatScope
@@ -99,7 +109,11 @@ class VimChatScope:
         global pyotr_enabled
         global pyotr_logging
         global gtk_enabled
+        global growl_enabled
+        global growl_notifier
+        global growl_icon
         self.gtk_enabled = gtk_enabled
+        self.growl_enabled = growl_enabled
         self.configFilePath = os.path.expanduser('~/.vimchat/config')
 
         vim.command('redir! > ~/.vimchat/vimchat.debug')
@@ -118,6 +132,13 @@ class VimChatScope:
             pynotify_enabled = True
         else:
             pynotify_enabled = False
+        
+        #Growl Setup
+        if self.growl_enabled:
+           self.growl_notifier = Growl.GrowlNotifier  ("VimChat", ["msg txrx", "account status"])
+           self.growl_notifier.register ()
+           self.growl_icon = Image.imageFromPath(os.path.expanduser('~/.vimchat/icon.gif'))
+
 
         otr_enabled = int(vim.eval('g:vimchat_otr'))
         otr_logging = int(vim.eval('g:vimchat_logotr'))
@@ -784,12 +805,16 @@ class VimChatScope:
         con = jabberClient.connect()
         if not con:
             print 'could not connect!\n'
+            if self.growl_enabled:
+                self.growl_notifier.notify ("account status", "VimChat", "Could not connect.", self.growl_icon)
             return 0
 
         auth=jabberClient.auth(
             JID.getNode(), password, resource=JID.getResource())
         if not auth:
             print 'could not authenticate!\n'
+            if self.growl_enabled:
+                self.growl_notifier.notify ("account status", "VimChat", "Could not authenticate.", self.growl_icon)
             return 0
 
         jabberClient.sendInitPresence(requestRoster=1)
@@ -804,6 +829,8 @@ class VimChatScope:
             self, jid, jabberClient, roster)
         self.accounts[accountJid].start()
         print "Connected with " + jid
+        if self.growl_enabled:
+            self.growl_notifier.notify ("account status", "VimChat", "Signed into " + jid + " successfully", self.growl_icon)
     #}}}
     #{{{ signOff
     def signOff(self):
@@ -841,11 +868,15 @@ class VimChatScope:
                 accounts[account].stop()
                 del accounts[account]
                 print "%s was signed off of VimChat!" % (account)
+                if self.growl_enabled:
+                    self.growl_notifier.notify ("account status", "VimChat", "%s was signed off of VimChat!" %(account), self.growl_icon)
             except:
                 print "Error signing off %s VimChat!" % (account)
                 print sys.exc_info()[0:2]
         else:
             print 'Error: [%s] is an invalid account.' % (account)
+            if self.growl_enabled:
+                    self.growl_notifier.notify ("account status", "VimChat", "Error signing off %s VimChat" %(account), self.growl_icon)
     #}}}
     #{{{ showStatus
     def showStatus(self):
@@ -1525,6 +1556,9 @@ You can type \on to reconnect.
             self.notify(jid, message, groupChat)
         except:
             print 'Could not notify:', message, 'from:', jid
+        
+        if self.growl_enabled:
+            self.growl_notifier.notify ("msg txrx", "VimChat - %s" % (jid), message, self.growl_icon)
     #}}}
     #{{{ notify
     def notify(self, jid, msg, groupChat):
