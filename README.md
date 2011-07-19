@@ -10,7 +10,8 @@ Vimchat allows you to easily connect to jabber servers such as Google Talk. It i
 
 Vimchat supports encryption via OTR (off the record).
 
-Vimchat can use a status icon in the system tray that will blink when you receive new messages. You simply need to put any icon you would like to use at ~/.vimchat/icon.gif. 
+Vimchat can use status icons in the system tray which will blink when you receive new messages. You simply need to put any icon you would like to use at ~/.vimchat/icon[\_status].gif. 
+The default icon is ~/.vimchat/icon.gif. To use a different icon for e.g. the away status put an icon at ~/.vimchat/icon\_away.gif
 
 # Requirements
 

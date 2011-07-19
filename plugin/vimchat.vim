@@ -177,13 +177,12 @@ class VimChatScope:
                 self.statusIcon = self.StatusIcon()
                 self.statusIcon.start()
                 self.blinktimeout = int(vim.eval('g:vimchat_blinktimeout'))
-
+    #}}}
     def stop(self):
         if self.statusIcon != None:
             self.statusIcon.stop()
         self.signOffAll()
     #}}}
-
     #CLASSES
     #{{{ class OtrOps
     class OtrOps:
@@ -389,6 +388,8 @@ class VimChatScope:
                     else:
                         pass
                 time.sleep(1)
+        #}}}
+        #{{{ stop
         def stop(self):
             self.online = 0
         #}}}
@@ -747,29 +748,56 @@ class VimChatScope:
     #}}}
     #{{{ class StatusIcon
     class StatusIcon(threading.Thread):
+        #{{{ __init__
+        def __init__(self):
+            self.status_icon_default = "~/.vimchat/icon.gif"
+            self.status_icon_path = self.status_icon_default
+            threading.Thread.__init__ ( self )
+        #}}}
+        #{{{ run
         def run(self):
             # GTK StausIcon
             gtk.gdk.threads_init()
             self.status_icon = StatusIcon()
-            self.status_icon.set_from_file(os.path.expanduser('~/.vimchat/icon.gif'))
+            self.changeStatus()
             self.status_icon.set_tooltip("VimChat")
             self.status_icon.set_visible(True)
             gtk.main()
+        #}}}
+        #{{{ blink
         def blink(self, value):
             self.status_icon.set_blinking(value)
-
+        #}}}
+        #{{{ changeStatus
+        def changeStatus(self,statusText=""):
+            if len(statusText)>0:
+                statusText = "_"+statusText
+            file_path = os.path.expanduser(re.sub("(\..[^.]*)$", statusText+"\\1", self.status_icon_default))
+            if not os.path.exists(file_path): 
+                file_path = os.path.expanduser(self.status_icon_default)
+                if not os.path.exists(file_path):
+                    return
+            self.status_icon_path = file_path
+            self.status_icon.set_from_file(self.status_icon_path)
+        #}}}
+        #{{{ stop
         def stop(self):
             self.status_icon.set_visible(False)
             gtk.main_quit()
+        #}}}
     #}}}
     #{{{ class BlinkClearer
     class BlinkClearer(threading.Thread):
+        #{{{ __init__
         def __init__(self, tt):
             self.timeoutTime = tt
             threading.Thread.__init__ ( self )
+        #}}}
+        #{{{ run
         def run(self):
             time.sleep(self.timeoutTime)
             VimChat.clearNotify()
+        #}}}
     #}}}
     #CONNECTION FUNCTIONS
     #{{{ signOn
@@ -1486,6 +1514,9 @@ You can type \on to reconnect.
         for jid,account in self.accounts.items():
             account.jabberPresenceUpdate(show,status,priority)
 
+        # update Icon if there are several icons available
+        if self.statusIcon != None: 
+            self.statusIcon.changeStatus(show)
         print "Updated status to: " + str(priority) + " -- " + show + " -- " + status
     #}}}
 
@@ -1517,7 +1548,6 @@ You can type \on to reconnect.
                     print "Buffer did not exist for: " + fromJid
         except Exception, e:
             print "Error in presenceUpdate: " + str(e)
-
     #}}}
     #{{{ messageReceived
     def messageReceived(self, account, fromJid, message, secure=False, groupChat=""):
@@ -1680,7 +1710,6 @@ You can type \on to reconnect.
     #}}}
 #}}}
 VimChat = VimChatScope()
-
 EOF
 
 "{{{ Vim Commands

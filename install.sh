@@ -12,7 +12,7 @@ cp syntax/vimchat.vim ~/.vim/syntax
 mkdir -p ~/.vimchat
 if [ $? != 0 ]; then echo "Could not create ~/.vimchat"; exit 1; fi
 
-if [ ! -f ~/.vimchat/icon.gif ]; then cp icon.gif ~/.vimchat/; fi
+if [ ! -f ~/.vimchat/icon.gif ]; then cp icon*.gif ~/.vimchat/; fi
 
 if [ -f ~/.vimchat/config ]; then
 	cp config ~/.vimchat/config.example
