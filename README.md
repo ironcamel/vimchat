@@ -77,9 +77,10 @@ __Optional ~/.vimrc Variables:__
 * let g:vimchat\_otr = (0 or 1) default is 0 -- enable otr or not
 * let g:vimchat\_logotr = (0 or 1) default is 1 -- log otr convos or not
 * let g:vimchat\_statusicon = (0 or 1) default is 1 -- use a gtk status icon? 
-* let g:vimchat\_blinktimeout = timeout in seconds default is -1
-* let g:vimchat\_buddylistmaxwidth = max width of buddy list window default ''
-* let g:vimchat\_timestampformat = format of the message timestamp default "[%H:%M]" 
+* let g:vimchat\_blinktimeout = timeout in seconds, default is -1
+* let g:vimchat\_buddylistmaxwidth = max width of buddy list window, default ''
+* let g:vimchat\_timestampformat = format of the message timestamp, default "[%H:%M]" 
+* let g:vimchat\_showPresenceNotification = notification if buddy changed status, comma-separated list of states, default ""
 
 # Contributors 
 

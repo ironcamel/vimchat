@@ -28,7 +28,7 @@
 "   g:vimchat_blinktimeout = timeout in seconds default is -1
 "   g:vimchat_buddylistmaxwidth = max width of buddy list window default ''
 "   g:vimchat_timestampformat = format of the message timestamp default "[%H:%M]" 
-
+"   g:vimchat_showPresenceNotification = notify if buddy changed status default ""
 
 python <<EOF
 #{{{ Imports
@@ -50,7 +50,7 @@ except:
 
 pynotify_enabled = False
 try:
-    if 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
+    if 'DBUS_SESSION_BUS_ADDRESS' in os.environ and int(vim.eval("has('gui_running')"))==0:
         import pynotify
         pynotify_enabled = True
     else:
@@ -69,7 +69,7 @@ except:
     pyotr_logging = False
 
 gtk_enabled = False
-if 'DISPLAY' in os.environ:
+if 'DISPLAY' in os.environ and int(vim.eval("has('gui_running')"))==0:
     try:
         from gtk import StatusIcon
         import gtk
@@ -102,6 +102,7 @@ class VimChatScope:
     lastMessageTime = 0
     blinktimeout = -1
     timeformat = "[%H:%M]"
+    oldShowList = {}
 
     #{{{ init
     def init(self):
@@ -128,7 +129,7 @@ class VimChatScope:
 
         #Libnotify
         libnotify = int(vim.eval('g:vimchat_libnotify'))
-        if libnotify == 1:
+        if libnotify == 1 and pynotify_enabled:
             pynotify_enabled = True
         else:
             pynotify_enabled = False
@@ -178,6 +179,7 @@ class VimChatScope:
                 self.statusIcon.start()
                 self.blinktimeout = int(vim.eval('g:vimchat_blinktimeout'))
     #}}}
+    #{{{ stop
     def stop(self):
         if self.statusIcon != None:
             self.statusIcon.stop()
@@ -506,18 +508,25 @@ class VimChatScope:
                     else:
                         show = 'offline'
 
+                accountName = ""
+                chat = ""
                 if type == "groupchat":
                     parts = fromJid.split('/')
-                    chatroom = parts[0]
+                    accountName = str(parts[0]) # in this case it is equal to the chatroom
                     user = ""
                     if len(parts) > 1:
                         user = parts[1]
-
-                    VimChat.presenceUpdate(self._jids,
-                        str(chatroom), str(user), show,status,priority)
+                    chat = str(user)
                 else:
-                    VimChat.presenceUpdate(self._jids,
-                        str(fromJid), fromJid,show,status,priority)
+                    accountName = str(fromJid)
+                    chat = fromJid
+
+                # notify if somebody is now available
+                if str(vim.eval('g:vimchat_showPresenceNotification')).find(str(show)) != -1:
+                    onlineUser = VimChat.getJidParts(accountName)[0]
+                    if VimChat.hasBuddyShowChanged(self._jids, onlineUser, str(show)):
+                        VimChat.pyNotification('Presence event', "<b>"+onlineUser+"</b>\nis now "+str(show), 'dialog-information')
+                VimChat.presenceUpdate(self._jids,accountName,chat,show,status,priority)
             except:
                 pass
         #}}}
@@ -799,6 +808,19 @@ class VimChatScope:
             VimChat.clearNotify()
         #}}}
     #}}}
+    #{{{ class MultiDict
+    class MultiDict(dict):
+        #{{{ __init__
+        def __init__(self, default=None):
+            self.default = default
+        #}}}
+        #{{{ __getitem__
+        def __getitem__(self, key):
+            if not self.has_key(key):
+                self[key] = self.default()
+            return dict.__getitem__(self, key)
+        #}}}
+    #}}}
     #CONNECTION FUNCTIONS
     #{{{ signOn
     def signOn(self):
@@ -1047,6 +1069,17 @@ class VimChatScope:
         self.writeBuddyList()
         vim.command("silent e!")
     #}}}
+    #{{{ hasBuddyShowChanged
+    def hasBuddyShowChanged(self,accountJid,jid,showNew):
+        showList = self.oldShowList
+        if showList != None:
+            account = showList.get(accountJid)
+            if account != None:
+                showOld = str(account.get(jid))
+                if account.get('online-since')+6 < int(time.time()) and showOld != showNew:
+                    return True
+        return False
+    #}}}
     #{{{ writeBuddyList
     def writeBuddyList(self):
         #write roster to file
@@ -1063,7 +1096,14 @@ You can type \on to reconnect.
 ******************************
 """ % (curJid))
                 continue
-            accountText = u"{{{ [+] %s\n"%(curJid)
+            accountPresenceInfo = account.jabberGetPresence()
+            if accountPresenceInfo[0] != None:
+                status = str(accountPresenceInfo[1])
+                if status == "None":
+                    status = ''
+                accountText = u"{{{ [+] %s\n\t%s: %s\n"%(curJid,str(accountPresenceInfo[0]),status)
+            else:
+                accountText = u"{{{ [+] %s\n"%(curJid)
             rF.write(accountText)
 
             roster = account._roster
@@ -1092,7 +1132,7 @@ You can type \on to reconnect.
                 
                 if show != u'off':
                     buddyText =\
-                        u"{{{ (%s) %s\n\t%s \n\tGroups: %s\n\t%s:\n%s\n}}}\n" %\
+                        u"{{{ (%s) %s\n\t%s \n\tGroups: %s\n\t%s: %s\n}}}\n" %\
                         (show, name, item, groups, show, status)
                     rF.write(buddyText)
 
@@ -1524,7 +1564,7 @@ You can type \on to reconnect.
     #{{{ presenceUpdate
     def presenceUpdate(self, account, chat, fromJid, show, status, priority):
         try:
-            #Only care if we have the chat window open
+            # update chat window
             fullJid = fromJid
             [fromJid,user,resource] = self.getJidParts(fromJid)
             [chat,nada,nada2] = self.getJidParts(fromJid)
@@ -1546,6 +1586,13 @@ You can type \on to reconnect.
                 else:
                     #Should never get here!
                     print "Buffer did not exist for: " + fromJid
+
+            # update old show list
+            if len(self.oldShowList)<1:
+                self.oldShowList = self.MultiDict(dict)
+            self.oldShowList[account][chat] = show
+            if not self.oldShowList[account].get('online-since'):
+                self.oldShowList[account]['online-since'] = int(time.time())
         except Exception, e:
             print "Error in presenceUpdate: " + str(e)
     #}}}
@@ -1612,17 +1659,20 @@ You can type \on to reconnect.
 
         vim.command("set tabline=%#Error#New-message-from-" + jid);
 
-        if pynotify_enabled and 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
-            pynotify.init('vimchat')
-            n = pynotify.Notification(jid + ' says: ', msg, 'dialog-warning')
-            n.set_timeout(10000)
-            n.show()
-
+        self.pyNotification(jid+' says: ', msg, 'dialog-warning');
         if self.gtk_enabled:
             self.statusIcon.blink(True)
             if self.blinktimeout != -1:
                 thr1 = self.BlinkClearer(self.blinktimeout)
                 thr1.start()
+    #}}}
+    #{{{ pyNotification
+    def pyNotification(self, subject, msg, type):
+        if pynotify_enabled:
+            pynotify.init('vimchat')
+            n = pynotify.Notification(subject, msg, type)
+            n.set_timeout(10000)
+            n.show()
     #}}}
     #{{{ clearNotify
     def clearNotify(self):
@@ -1766,6 +1816,9 @@ fu! VimChatCheckVars()
     if !exists('g:vimchat_timestampformat')
         let g:vimchat_timestampformat="[%H:%M]"
     endif 
+    if !exists('g:vimchat_showPresenceNotification')
+        let g:vimchat_showPresenceNotification=""
+    endif
 
     return 1
 endfu
