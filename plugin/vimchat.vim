@@ -33,6 +33,9 @@
 
 python <<EOF
 try:
+    import warnings
+    warnings.filterwarnings('ignore', category=DeprecationWarning)
+
     from collections import defaultdict
     from  ConfigParser import RawConfigParser
     import os
@@ -42,10 +45,8 @@ try:
     import threading
     import time
     import vim
-    import warnings
     import xmpp
 
-    warnings.filterwarnings('ignore', category=DeprecationWarning)
 
     try:
         import simplejson as json
