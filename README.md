@@ -82,6 +82,12 @@ __Optional ~/.vimrc Variables:__
 * let g:vimchat\_timestampformat = format of the message timestamp, default "[%H:%M]" 
 * let g:vimchat\_showPresenceNotification = notification if buddy changed status, comma-separated list of states, default ""
 
+# Hacking
+Keep all lines to 80 characters wide or less
+All python code should follow pep8 guidelines
+All new features should update documentation in the README
+
+
 # Contributors 
 
 * Philipp [philsmd](https://github.com/philsmd)
