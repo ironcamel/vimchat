@@ -27,8 +27,8 @@
 "   g:vimchat_statusicon = (0 or 1) default is 1
 "   g:vimchat_blinktimeout = timeout in seconds default is -1
 "   g:vimchat_buddylistmaxwidth = max width of buddy list window default ''
-"   g:vimchat_timestampformat = format of the message timestamp default "[%H:%M]" 
-
+"   g:vimchat_timestampformat = format of the message timestamp default [%H:%M]
+"   g:vimchat_showPresenceNotification = notify if buddy changed status default ""
 
 python <<EOF
 #{{{ Imports
@@ -37,6 +37,7 @@ try:
     warnings.filterwarnings('ignore', category=DeprecationWarning)
     import vim
     import os, os.path, select, threading, xmpp, re, time, sys
+    from collections import defaultdict
     from  ConfigParser import RawConfigParser
     try:
         import simplejson as json
@@ -102,6 +103,7 @@ class VimChatScope:
     lastMessageTime = 0
     blinktimeout = -1
     timeformat = "[%H:%M]"
+    oldShowList = {}
 
     #{{{ init
     def init(self):
@@ -128,16 +130,16 @@ class VimChatScope:
 
         #Libnotify
         libnotify = int(vim.eval('g:vimchat_libnotify'))
-        if libnotify == 1:
-            pynotify_enabled = True
-        else:
+        if not libnotify:
             pynotify_enabled = False
         
         #Growl Setup
         if self.growl_enabled:
-           self.growl_notifier = Growl.GrowlNotifier  ("VimChat", ["msg txrx", "account status"])
+           self.growl_notifier = Growl.GrowlNotifier  ("VimChat", ["msg txrx",
+           "account status"])
            self.growl_notifier.register ()
-           self.growl_icon = Image.imageFromPath(os.path.expanduser('~/.vimchat/icon.gif'))
+           self.growl_icon = Image.imageFromPath(os.path.expanduser(
+           '~/.vimchat/icon.gif'))
 
 
         otr_enabled = int(vim.eval('g:vimchat_otr'))
@@ -178,6 +180,7 @@ class VimChatScope:
                 self.statusIcon.start()
                 self.blinktimeout = int(vim.eval('g:vimchat_blinktimeout'))
     #}}}
+    #{{{ stop
     def stop(self):
         if self.statusIcon != None:
             self.statusIcon.stop()
@@ -506,18 +509,30 @@ class VimChatScope:
                     else:
                         show = 'offline'
 
+                accountName = ""
+                chat = ""
                 if type == "groupchat":
                     parts = fromJid.split('/')
-                    chatroom = parts[0]
+                    # in this case it is equal to the chatroom
+                    accountName = str(parts[0])
                     user = ""
                     if len(parts) > 1:
                         user = parts[1]
-
-                    VimChat.presenceUpdate(self._jids,
-                        str(chatroom), str(user), show,status,priority)
+                    chat = str(user)
                 else:
-                    VimChat.presenceUpdate(self._jids,
-                        str(fromJid), fromJid,show,status,priority)
+                    accountName = str(fromJid)
+                    chat = fromJid
+
+                # notify if somebody is now available
+                if str(vim.eval('g:vimchat_showPresenceNotification')).find(
+                        str(show)) != -1:
+                    onlineUser = VimChat.getJidParts(accountName)[0]
+                    if VimChat.hasBuddyShowChanged(self._jids, onlineUser, 
+                        str(show)):
+                        VimChat.pyNotification('Presence event',"<b>"+onlineUser+
+                        "</b>\nis now "+str(show),'dialog-information')
+                VimChat.presenceUpdate(self._jids,accountName,chat,show,status,
+                    priority)
             except:
                 pass
         #}}}
@@ -772,7 +787,8 @@ class VimChatScope:
         def changeStatus(self,statusText=""):
             if len(statusText)>0:
                 statusText = "_"+statusText
-            file_path = os.path.expanduser(re.sub("(\..[^.]*)$", statusText+"\\1", self.status_icon_default))
+            file_path = os.path.expanduser(re.sub("(\..[^.]*)$",statusText+"\\1"
+                ,self.status_icon_default))
             if not os.path.exists(file_path): 
                 file_path = os.path.expanduser(self.status_icon_default)
                 if not os.path.exists(file_path):
@@ -1046,6 +1062,18 @@ class VimChatScope:
     def refreshBuddyList(self):
         self.writeBuddyList()
         vim.command("silent e!")
+    #}}}
+    #{{{ hasBuddyShowChanged
+    def hasBuddyShowChanged(self,accountJid,jid,showNew):
+        showList = self.oldShowList
+        if showList != None:
+            account = showList.get(accountJid)
+            if account != None:
+                showOld = str(account.get(jid))
+                if account.get('online-since')+6 < int(time.time()) and \
+                    showOld != showNew:
+                    return True
+        return False
     #}}}
     #{{{ writeBuddyList
     def writeBuddyList(self):
@@ -1500,7 +1528,9 @@ You can type \on to reconnect.
     #{{{ setStatus
     def setStatus(self, status=None):
         if not status:
-            status = str(vim.eval('input("Status: (away,xa,dnd,chat),message,priority: ")'))
+            status = str(
+                vim.eval('input("Status: (away,xa,dnd,chat),message,\
+                priority: ")'))
 
         parts = status.split(',')
         show = parts[0]
@@ -1517,14 +1547,14 @@ You can type \on to reconnect.
         # update Icon if there are several icons available
         if self.statusIcon != None: 
             self.statusIcon.changeStatus(show)
-        print "Updated status to: " + str(priority) + " -- " + show + " -- " + status
+        print "Updated status to: "+str(priority)+" -- "+show + " -- "+status
     #}}}
 
     #INCOMING
     #{{{ presenceUpdate
     def presenceUpdate(self, account, chat, fromJid, show, status, priority):
         try:
-            #Only care if we have the chat window open
+            # update chat window
             fullJid = fromJid
             [fromJid,user,resource] = self.getJidParts(fromJid)
             [chat,nada,nada2] = self.getJidParts(fromJid)
@@ -1539,18 +1569,26 @@ You can type \on to reconnect.
                 chatBuf = self.getBufByName(chatFile)
                 bExists = int(vim.eval('buflisted("' + chatFile + '")'))
                 if chatBuf and bExists:
-                    statusUpdateLine = self.formatPresenceUpdateLine(fullJid,show,status)
+                    statusUpdateLine = self.formatPresenceUpdateLine(fullJid,
+                        show,status)
                     if chatBuf[-1] != statusUpdateLine:
                         chatBuf.append(statusUpdateLine)
                         self.moveCursorToBufBottom(chatBuf)
                 else:
                     #Should never get here!
                     print "Buffer did not exist for: " + fromJid
+
+            # update old show list
+            if len(self.oldShowList)<1:
+                self.oldShowList = defaultdict(dict)
+            self.oldShowList[account][chat] = show
+            if not self.oldShowList[account].get('online-since'):
+                self.oldShowList[account]['online-since'] = int(time.time())
         except Exception, e:
             print "Error in presenceUpdate: " + str(e)
     #}}}
     #{{{ messageReceived
-    def messageReceived(self, account, fromJid, message, secure=False, groupChat=""):
+    def messageReceived(self,account,fromJid,message,secure=False,groupChat=""):
         #Store the buffer we were in
         origBufNum = vim.current.buffer.number
 
@@ -1588,7 +1626,8 @@ You can type \on to reconnect.
             print 'Could not notify:', message, 'from:', jid
         
         if self.growl_enabled:
-            self.growl_notifier.notify ("msg txrx", "VimChat - %s" % (jid), message, self.growl_icon)
+            self.growl_notifier.notify ("msg txrx","VimChat - %s"%(jid),message,
+            self.growl_icon)
     #}}}
     #{{{ notify
     def notify(self, jid, msg, groupChat):
@@ -1612,17 +1651,20 @@ You can type \on to reconnect.
 
         vim.command("set tabline=%#Error#New-message-from-" + jid);
 
-        if pynotify_enabled and 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
-            pynotify.init('vimchat')
-            n = pynotify.Notification(jid + ' says: ', msg, 'dialog-warning')
-            n.set_timeout(10000)
-            n.show()
-
+        self.pyNotification(jid+' says: ', msg, 'dialog-warning');
         if self.gtk_enabled:
             self.statusIcon.blink(True)
             if self.blinktimeout != -1:
                 thr1 = self.BlinkClearer(self.blinktimeout)
                 thr1.start()
+    #}}}
+    #{{{ pyNotification
+    def pyNotification(self, subject, msg, type):
+        if pynotify_enabled:
+            pynotify.init('vimchat')
+            n = pynotify.Notification(subject, msg, type)
+            n.set_timeout(10000)
+            n.show()
     #}}}
     #{{{ clearNotify
     def clearNotify(self):
@@ -1766,6 +1808,9 @@ fu! VimChatCheckVars()
     if !exists('g:vimchat_timestampformat')
         let g:vimchat_timestampformat="[%H:%M]"
     endif 
+    if !exists('g:vimchat_showPresenceNotification')
+        let g:vimchat_showPresenceNotification=""
+    endif
 
     return 1
 endfu
