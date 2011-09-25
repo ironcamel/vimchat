@@ -60,7 +60,7 @@ except:
 
 pynotify_enabled = False
 try:
-    if 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
+    if 'DBUS_SESSION_BUS_ADDRESS' in os.environ and int(vim.eval("has('gui_running')"))==0: 
         import pynotify
         pynotify_enabled = True
     else:
@@ -79,7 +79,7 @@ except:
     pyotr_logging = False
 
 gtk_enabled = False
-if 'DISPLAY' in os.environ:
+if 'DISPLAY' in os.environ and int(vim.eval("has('gui_running')"))==0: 
     try:
         from gtk import StatusIcon
         import gtk
