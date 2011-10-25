@@ -1013,7 +1013,6 @@ class VimChatScope:
     def beginChatFromBuddyList(self):
         account, toJid = self.getBuddyListItem('jid')
         [jid,user,resource] = self.getJidParts(toJid)
-
         buf = VimChat.beginChat(account, jid)
         if not buf:
             #print "Error getting buddy info: " + jid
@@ -1686,7 +1685,7 @@ com! VimChatJoinGroupChat py VimChat.openGroupChat()
 com! VimChatOtrVerifyBuddy py VimChat.otrVerifyBuddy()
 com! VimChatOtrSMPRespond py VimChat.otrSmpRespond()
 com! VimChatOtrGenerateKey py VimChat.otrGenerateKey()
-com! -nargs=0 VimChatSetStatus py VimChat.setStatus(<args>)
+com! -nargs=* VimChatSetStatus py VimChat.setStatus(<args>)
 com! VimChatShowStatus py VimChat.showStatus()
 com! VimChatJoinChatroom py VimChat.joinChatroom()
 autocmd! VIMLeave * :VimChatStop
