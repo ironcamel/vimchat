@@ -30,6 +30,7 @@
 "   g:vimchat_timestampformat = format of the msg timestamp default "[%H:%M]" 
 "   g:vimchat_showPresenceNotification =
 "       notify if buddy changed status default ""
+"   g:vimchat_statusAutoCompletion = (0 or 1) default is 1
 
 python <<EOF
 try:
@@ -1457,9 +1458,23 @@ class VimChatScope:
         vim.command('normal G')
 
     def setStatus(self, status=None):
+        if not self.accounts:
+            print "Not Connected!  Please connect first."
+            return 0
         if not status:
+            statusCompletion = ''
+            if int(vim.eval("g:vimchat_statusAutoCompletion"))==1:
+                firstAccount = self.accounts.itervalues().next()
+                if firstAccount != None:
+                    [oldShow,oldStatus] = firstAccount.jabberGetPresence()
+                
+                if oldShow != None and str(oldShow) != "None":
+                    statusCompletion = str(oldShow)
+                if oldStatus != None and str(oldStatus) != "None":
+                    statusCompletion += ','+str(oldStatus)
             status = str(vim.eval(
-                'input("Status: (away,xa,dnd,chat),message,priority: ")'))
+                'input("Status: (away,xa,dnd,chat),message,priority: ",'+
+                    '"'+statusCompletion+'")'))
 
         parts = status.split(',')
         show = parts[0]
@@ -1725,6 +1740,9 @@ fu! VimChatCheckVars()
     endif 
     if !exists('g:vimchat_showPresenceNotification')
         let g:vimchat_showPresenceNotification=""
+    endif
+    if !exists('g:vimchat_statusAutoCompletion')
+        let g:vimchat_statusAutoCompletion=1
     endif
 
     return 1
