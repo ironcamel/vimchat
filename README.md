@@ -81,6 +81,7 @@ __Optional ~/.vimrc Variables:__
 * let g:vimchat\_buddylistmaxwidth = max width of buddy list window, default ''
 * let g:vimchat\_timestampformat = format of the message timestamp, default "[%H:%M]" 
 * let g:vimchat\_showPresenceNotification = notification if buddy changed status, comma-separated list of states, default ""
+* let g:vimchat\_autoLogin = (0 or 1), default is 0
 
 # Hacking
 

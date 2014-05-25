@@ -30,6 +30,7 @@
 "   g:vimchat_timestampformat = format of the msg timestamp default "[%H:%M]" 
 "   g:vimchat_showPresenceNotification =
 "       notify if buddy changed status default ""
+"   g:vimchat_autoLogin = (0 or 1) default is 0
 
 python <<EOF
 try:
@@ -1735,6 +1736,23 @@ function! VimChatFoldText()
     let line=strpart('                                     ', 0, (v:foldlevel - 1)).substitute(line,'\s*{\+\s*', '', '')
     return line
 endfunction
-"}}}
+
+" AutoLogin
+" Default value for autoLogin is 0 (disabled)
+if !exists('g:vimchat_autoLogin')
+    let g:vimchat_autoLogin=0
+endif
+if g:vimchat_autoLogin == 1
+    augroup vimchat_autoload
+        autocmd TermResponse * call VimChatAutoload()
+    augroup END
+
+    fun! VimChatAutoload()
+        py VimChat.init()
+        " the following commands disable the autocmd after the first run
+        autocmd! vimchat_autoload
+        augroup! vimchat_autoload
+    endfun
+endif
 
 " vim:et:fdm=marker:sts=4:sw=4:ts=4
