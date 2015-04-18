@@ -9,7 +9,7 @@
 " but the transports must be set up on another client as vimchat does not
 " support setting them up yet
 "
-" This branchh supports multiple versions at a time, but probably still 
+" This branch supports multiple versions at a time, but probably still 
 " has a decent amount of bugs!
 "
 " Note: The vimchat_jid and vimchat_password variables have been *changed*
