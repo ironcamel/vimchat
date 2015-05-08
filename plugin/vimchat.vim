@@ -120,6 +120,12 @@ class VimChatScope:
         global growl_enabled
         global growl_notifier
         global growl_icon
+        
+        # Don't initialize/start VimChat more than once
+        if self.accounts:
+            print "VimChat is already started"
+            return
+
         self.gtk_enabled = gtk_enabled
         self.growl_enabled = growl_enabled
         self.configFilePath = os.path.expanduser('~/.vimchat/config')
