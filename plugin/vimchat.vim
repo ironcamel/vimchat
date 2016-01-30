@@ -35,6 +35,16 @@
 "   g:vimchat_no_scrolling_maps = (0 or 1) default is 0
 "   g:vimchat_openlink = map for 'open link in browser' default is '<C-]>'
 "   g:vimchat_browser_in_bg = (0 or 1) default is 1
+"   g:vimchat_extended_highlighting = switch extended highlighting globally on
+"                                     or off(0 or 1) default 0
+"   g:vimchat_highlight_emoticons = (0 or 1) default 1
+"   g:vimchat_highlight_shellcmds = (0 or 1) default 1
+"   g:vimchat_highlight_emphasis = (0 or 1) default 1
+"   g:vimchat_highlight_strings = (0 or 1) default 1
+"   g:vimchat_highlight_addresses = (0 or 1) default 1
+"   g:vimchat_highlight_links = (0 or 1) default 1
+"   g:vimchat_highlight_paths = (0 or 1) default 1
+"   g:vimchat_highlight_mail = (0 or 1) default 1
 
 if exists('g:loaded_vimchat')
   finish

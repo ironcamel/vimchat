@@ -1730,11 +1730,38 @@ fu! vimchat#main#CheckVars() "{{{
     if !exists('g:vimchat_openlink')
       let g:vimchat_openlink = '<C-]>'
     endif
-    "if !exists('g:vimchat_browser_cmd')
-      "let g:vimchat_browser_cmd = 'chromium-browser'
-    "endif
+    if !exists('g:vimchat_browser_cmd')
+      let g:vimchat_browser_cmd = 'chromium-browser'
+    endif
     if !exists('g:vimchat_browser_in_bg')
       let g:vimchat_browser_in_bg = 1
+    endif
+    if !exists('g:vimchat_extended_highlighting')
+      let g:vimchat_extended_highlighting = 0
+    endif
+    if !exists('g:vimchat_highlight_emoticons')
+      let g:vimchat_highlight_emoticons = 1
+    endif
+    if !exists('g:vimchat_highlight_shellcmds')
+      let g:vimchat_highlight_shellcmds = 1
+    endif
+    if !exists('g:vimchat_highlight_emphasis')
+      let g:vimchat_highlight_emphasis = 1
+    endif
+    if !exists('g:vimchat_highlight_strings')
+      let g:vimchat_highlight_strings = 1
+    endif
+    if !exists('g:vimchat_highlight_addresses')
+      let g:vimchat_highlight_addresses = 1
+    endif
+    if !exists('g:vimchat_highlight_links')
+      let g:vimchat_highlight_links = 1
+    endif
+    if !exists('g:vimchat_highlight_paths')
+      let g:vimchat_highlight_paths = 1
+    endif
+    if !exists('g:vimchat_highlight_mail')
+      let g:vimchat_highlight_mail = 1
     endif
     return 1
 endfu "}}}
