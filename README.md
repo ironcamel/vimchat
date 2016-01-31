@@ -95,6 +95,10 @@ To send multiple lines, select the lines in visual mode and then hit enter.
 Typing `<leader>l` will bring up a new tab containing log files for the current
 user. 
 
+When moving up beyond the first line, the most recent logs will be prepended if found.
+
+The user can enable extended syntax highlighting (urls, emoticons, ...) at wish.
+
 # Chat Rooms
 
 You can configure chat rooms in your vimchat config file.
@@ -124,6 +128,19 @@ You can can update your `~/.vimrc` with these settings to customize vimchat. All
 * let g:vimchat\_buddylistmaxwidth = max width of buddy list window, default ''
 * let g:vimchat\_timestampformat = format of the message timestamp, default "[%H:%M]" 
 * let g:vimchat\_showPresenceNotification = notification if buddy changed status, comma-separated list of states, default ""
+* let g:vimchat\_scrolling = (0 or 1) default is 1 -- reload logs from previous conversations when scrolling beyong line 1
+* let g:vimchat\_extended\_highlighting = (0 or 1) default is 0 -- some syntax highlighting in text
+
+*Extended highlighting*, if activated, can be further customized by setting these variables:
+
+* let g:vimchat\_highlight\_emoticons = (0 or 1) default 1
+* let g:vimchat\_highlight\_shellcmds = (0 or 1) default 1
+* let g:vimchat\_highlight\_emphasis = (0 or 1) default 1
+* let g:vimchat\_highlight\_strings = (0 or 1) default 1
+* let g:vimchat\_highlight\_addresses = (0 or 1) default 1
+* let g:vimchat\_highlight\_links = (0 or 1) default 1
+* let g:vimchat\_highlight\_paths = (0 or 1) default 1
+* let g:vimchat\_highlight\_mail = (0 or 1) default 1
 
 # Contributing
 
