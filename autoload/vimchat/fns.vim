@@ -55,7 +55,7 @@ func! s:GetDate(offset) "{{{
   return strftime(dateFormat, s:startTime - a:offset*secsPerDay)
 endfunc "}}}
 
-func! s:ConvertIsoDate(date, format) "{{{
+func! vimchat#fns#ConvertIsoDate(date, format) "{{{
 " iso date format is YYYY-mm-dd
 " log files on disk are all saved iso compliant
 " thus we don't need any further checking here
@@ -89,7 +89,7 @@ endfunc "}}}
 func! s:ProcessLine(line, date) "{{{
   if a:date != s:GetDate(0)
     let dateFormat = substitute(get(g:, 'vimchat_dateformat', '%F'), '^\[\|]$', '', 'g')
-    let date = s:ConvertIsoDate(a:date, dateFormat)
+    let date = vimchat#fns#ConvertIsoDate(a:date, dateFormat)
     let line = substitute(a:line, '^\(\[\)\([0-9:]*\)\(\]\)', '['.date.' \2]', '')
   else
     let line = a:line
