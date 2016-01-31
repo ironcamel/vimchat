@@ -9,10 +9,6 @@ func! s:EscapeRegex(li) "{{{
   return map(a:li, 's:EscapeRegexTokens(v:val)')
 endfunc "}}}
 
-func! s:AllHeads(li) "{{{
-  return map(a:li, 'split(v:val, "\\s\\+")[0]')
-endfunc "}}}
-
 func! s:Or(li) "{{{
   return '\('.join(a:li, '\|').'\)'
 endfunc "}}}
