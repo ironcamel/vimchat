@@ -1700,6 +1700,9 @@ fu! vimchat#main#CheckVars() "{{{
     if !exists('g:vimchat_timestampformat')
         let g:vimchat_timestampformat="[%H:%M]"
     endif
+    if !exists('g:vimchat_dateformat')
+        let g:vimchat_dateformat="[%Y-%m-%d]"
+    endif
     if !exists('g:vimchat_showPresenceNotification')
         let g:vimchat_showPresenceNotification=""
     endif

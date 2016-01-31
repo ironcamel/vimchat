@@ -28,6 +28,7 @@
 "   g:vimchat_blinktimeout = timeout in seconds default is -1
 "   g:vimchat_buddylistmaxwidth = max width of buddy list window default ''
 "   g:vimchat_timestampformat = format of the msg timestamp default "[%H:%M]"
+"   g:vimchat_dateformat = format of the msg date for logs default "[%Y-%m-%d]"
 "   g:vimchat_showPresenceNotification = notify if buddy changed status default ""
 "   g:vimchat_scrollup = map for 'scroll one screen up' default is '<C-b>'
 "   g:vimchat_scrollhalfwayup = map for 'scroll half screen up' default is <C-u>'

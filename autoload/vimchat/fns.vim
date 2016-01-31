@@ -2,6 +2,8 @@ if exists('g:autoloaded_vimchat_fns')
   finish
 endif
 let g:autoloaded_vimchat_fns = 1
+" save starttime, so that offsets are calculated accordingly
+let s:startTime = reltime()[0]
 
 " script local definitions {{{
 let s:offsetMap = {}
@@ -49,7 +51,27 @@ endfunc "}}}
 
 func! s:GetDate(offset) "{{{
   let secsPerDay = 86400
-  return strftime('%F', reltime()[0] - a:offset*secsPerDay)
+  let dateFormat = '%F'
+  return strftime(dateFormat, s:startTime - a:offset*secsPerDay)
+endfunc "}}}
+
+func! s:ConvertIsoDate(date, format) "{{{
+" iso date format is YYYY-mm-dd
+" log files on disk are all saved iso compliant
+" thus we don't need any further checking here
+ 
+py << EOF
+import datetime
+
+date_as_string = vim.eval('a:date')
+year = int(date_as_string[:4])
+month = int(date_as_string[5:7])
+day = int(date_as_string[-2:])
+format = vim.eval('a:format')
+
+vim.command('let ret =  '+repr(datetime.date(year, month, day).strftime(format)))
+EOF
+  return ret
 endfunc "}}}
 
 func! s:GetProtocolDir() "{{{
@@ -66,7 +88,9 @@ endfunc "}}}
 
 func! s:ProcessLine(line, date) "{{{
   if a:date != s:GetDate(0)
-    let line = substitute(a:line, '^\(\[\)\([0-9:]*\)\(\]\)', '['.a:date.' \2]', '')
+    let dateFormat = substitute(get(g:, 'vimchat_dateformat', '%F'), '^\[\|]$', '', 'g')
+    let date = s:ConvertIsoDate(a:date, dateFormat)
+    let line = substitute(a:line, '^\(\[\)\([0-9:]*\)\(\]\)', '['.date.' \2]', '')
   else
     let line = a:line
   endif
