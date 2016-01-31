@@ -1724,8 +1724,8 @@ fu! vimchat#main#CheckVars() "{{{
     if !exists('g:vimchat_dnd_cmd')
       let g:vimchat_dnd_cmd = 'dnd'
     endif
-    if !exists('g:vimchat_no_scrolling_maps')
-      let g:vimchat_no_scrolling_maps = 0
+    if !exists('g:vimchat_scrolling')
+      let g:vimchat_scrolling = 1
     endif
     if !exists('g:vimchat_openlink')
       let g:vimchat_openlink = '<C-]>'

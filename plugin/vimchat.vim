@@ -32,7 +32,7 @@
 "   g:vimchat_scrollup = map for 'scroll one screen up' default is '<C-b>'
 "   g:vimchat_scrollhalfwayup = map for 'scroll half screen up' default is <C-u>'
 "   g:vimchat_moveup = map for 'move one line up' default is 'k'
-"   g:vimchat_no_scrolling_maps = (0 or 1) default is 0
+"   g:vimchat_scrolling = (0 or 1) default is 1
 "   g:vimchat_openlink = map for 'open link in browser' default is '<C-]>'
 "   g:vimchat_browser_in_bg = (0 or 1) default is 1
 "   g:vimchat_extended_highlighting = switch extended highlighting globally on

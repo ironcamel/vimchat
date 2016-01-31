@@ -180,7 +180,7 @@ func! vimchat#fns#SetupLocalMapsAndCommands() "{{{
 
   call s:DefineStateCommands()
 
-  if get(g:, 'vimchat_no_scrolling_maps') | return | endif
+  if !get(g:, 'vimchat_scrolling', 1) | return | endif
 
   exe 'nnoremap <silent> <buffer> '.g:vimchat_scrollup.' :call '.'<sid>ScrollUp()<CR>'
   exe 'nnoremap <silent> <buffer> '.g:vimchat_scrollhalfwayup.' :call <sid>MoveUp()<CR>'
