@@ -1,9 +1,11 @@
+" autoload only once {{{
 if exists('g:autoloaded_vimchat_fns')
   finish
 endif
 let g:autoloaded_vimchat_fns = 1
 " save starttime, so that offsets are calculated accordingly
 let s:startTime = reltime()[0]
+"}}}
 
 " script local definitions {{{
 let s:offsetMap = {}

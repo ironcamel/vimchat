@@ -1,11 +1,13 @@
+" regex related s: variables {{{
 let s:emoticons = readfile(expand('<sfile>:p:h:h') . '/resources/emoticons')
 let s:bashCmds = readfile(expand('<sfile>:p:h:h') . '/resources/bash-cmds')
+"}}}
 
 func! s:EscapeRegex(li) abort "{{{
   return map(a:li, 'vimchat#parseFormatters#EscapeRegexTokens(v:val)')
 endfunc "}}}
 
-func! s:Or(li) "{{{
+func! s:Or(li) abort "{{{
   return '\('.join(a:li, '\|').'\)'
 endfunc "}}}
 

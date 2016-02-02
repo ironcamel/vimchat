@@ -16,7 +16,7 @@
 " into the vimchat_accounts dictionary.  This version of vimchat will not
 " work unless you make this change!
 "
-" Supported ~/.vimrc Variables:
+" Supported ~/.vimrc Variables: {{{
 "   g:vimchat_accounts = {'jabber id':'password',...}
 "   g:vimchat_buddylistwidth = width of buddy list
 "   g:vimchat_libnotify = (0 or 1) default is 1
@@ -46,19 +46,24 @@
 "   g:vimchat_highlight_links = (0 or 1) default 1
 "   g:vimchat_highlight_paths = (0 or 1) default 1
 "   g:vimchat_highlight_mail = (0 or 1) default 1
+"}}}
 
+" load only once {{{
 if exists('g:loaded_vimchat')
   finish
 endif
 let g:loaded_vimchat = 1
+"}}}
 
+" VimChat command {{{
 com!
       \ -nargs=*
       \ VimChat
       \ call vimchat#main#main(<f-args>)
+"}}}
 
-augroup vimchat_setup_scroll_maps
+augroup vimchat_setup_scroll_maps "{{{
   autocmd!
   autocmd FileType vimchat call vimchat#fns#SetupLocalMapsAndCommands()
   autocmd FileType vimchat setlocal conceallevel=2
-augroup END
+augroup END "}}}
