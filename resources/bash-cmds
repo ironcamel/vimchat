@@ -208,10 +208,7 @@ sync
 tail
 tar
 tee
-test
-time
 timeout
-times
 top
 touch
 tput
