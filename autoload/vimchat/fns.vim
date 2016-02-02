@@ -59,7 +59,7 @@ func! vimchat#fns#ConvertIsoDate(date, format) "{{{
 " iso date format is YYYY-mm-dd
 " log files on disk are all saved iso compliant
 " thus we don't need any further checking here
- 
+
 py << EOF
 import datetime
 
@@ -86,11 +86,26 @@ func! s:GetProtocolPath(offset) "{{{
   return join([s:GetProtocolDir(), chatPartner], '/').'-'.date
 endfunc "}}}
 
+func! s:GetLinePattern(enclosers, timePattern) abort "{{{
+  let pattern = '^\('.a:enclosers[0].'\)\('.a:timePattern.'\)\('.a:enclosers[1].'\)'
+  return pattern
+endfunc "}}}
+
+func! s:GetReplacement(date) abort "{{{
+  let subst = '\1'.a:date.' '.'\2\3'
+  return subst
+endfunc "}}}
+
 func! s:ProcessLine(line, date) "{{{
   if a:date != s:GetDate(0)
-    let dateFormat = substitute(get(g:, 'vimchat_dateformat', '%F'), '^\[\|]$', '', 'g')
+    let dateFormat = vimchat#parseFormatters#RemoveEnclosers(get(g:, 'vimchat_dateformat', '%F'))
     let date = vimchat#fns#ConvertIsoDate(a:date, dateFormat)
-    let line = substitute(a:line, '^\(\[\)\([0-9:]*\)\(\]\)', '['.date.' \2]', '')
+    let timePattern = vimchat#parseFormatters#GetDatelikeRegex(g:vimchat_timestampformat)
+    let enclosers = vimchat#parseFormatters#GetEnclosers(g:vimchat_timestampformat)
+    let subst = join(enclosers, timePattern)
+    let pattern = s:GetLinePattern(enclosers, timePattern)
+    let subst = s:GetReplacement(date)
+    let line = substitute(a:line, pattern, subst, '')
   else
     let line = a:line
   endif

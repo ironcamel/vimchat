@@ -1,12 +1,8 @@
 let s:emoticons = readfile(expand('<sfile>:p:h:h') . '/resources/emoticons')
 let s:bashCmds = readfile(expand('<sfile>:p:h:h') . '/resources/bash-cmds')
 
-func! s:EscapeRegexTokens(text)  "{{{
-  return substitute(a:text, '[/\\*$^.*~\]\[&]', '\\&', 'g')
-endfunc "}}}
-
-func! s:EscapeRegex(li) "{{{
-  return map(a:li, 's:EscapeRegexTokens(v:val)')
+func! s:EscapeRegex(li) abort "{{{
+  return map(a:li, 'vimchat#parseFormatters#EscapeRegexTokens(v:val)')
 endfunc "}}}
 
 func! s:Or(li) "{{{
@@ -14,10 +10,12 @@ func! s:Or(li) "{{{
 endfunc "}}}
 
 " basic vimchat settings {{{
-syn match vimChatMsg 	/^\[[-0-9: ]*\].\{-}:/	contains=vimChatDateTime,vimChatMe
-syn match vimChatDateTime  	/\[[-0-9: ]*\]/   contained contains=vimChatDate,vimChatTime nextgroup=vimChatMe
-syn match vimChatDate  	/\(\d\d\d\d-\d\d-\d\d \)\?/			contained nextgroup=vimChatTime
-syn match vimChatTime  	/[\[ ]\@=\d\d\(:\d\d\)\{0,2\}/			contained
+let [dateTimePattern, datePattern, timePattern] = vimchat#parseFormatters#getPatterns()
+
+exe 'syn match vimChatMsg 	/^'.dateTimePattern.'.\{-}:/	contains=vimChatDateTime,vimChatMe'
+exe 'syn match vimChatDateTime  	/'.dateTimePattern.'/   contained contains=vimChatDate,vimChatTime nextgroup=vimChatMe'
+exe 'syn match vimChatDate  	/'.datePattern.'/			containedin=vimChatDateTime nextgroup=vimChatTime'
+exe 'syn match vimChatTime  	/'.timePattern.'/			containedin=vimChatDateTime'
 syn match vimChatMe  	/Me:/		 			contained
 
 hi link vimChatMsg		Comment
