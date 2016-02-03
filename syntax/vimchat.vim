@@ -20,11 +20,11 @@ exe 'syn match vimChatDate  	/'.datePattern.'/			containedin=vimChatDateTime nex
 exe 'syn match vimChatTime  	/'.timePattern.'/			containedin=vimChatDateTime'
 syn match vimChatMe  	/Me:/		 			contained
 
-hi link vimChatMsg		Comment
-hi link vimChatDateTime		String
-hi link vimChatDate		NonText
-hi link vimChatTime		Comment
-hi link vimChatMe		Type
+exe 'hi link vimChatMsg '.g:vimchat_hiLinkMsg
+exe 'hi link vimChatDateTime '.g:vimchat_hiLinkDateTime
+exe 'hi link vimChatDate '.g:vimchat_hiLinkDate
+exe 'hi link vimChatTime '.g:vimchat_hiLinkTime
+exe 'hi link vimChatMe '.g:vimchat_hiLinkMe
 "}}}
 
 if !g:vimchat_extendedHighlighting | finish | endif
@@ -32,7 +32,7 @@ if !g:vimchat_extendedHighlighting | finish | endif
 " shell commands {{{
 if g:vimchat_highlightShellcmds
   exe 'syn match vimChatShellCmd /[ (]\@<='.s:Or(s:bashCmds).'\>/'
-  hi link vimChatShellCmd Function
+  exe 'hi link vimChatShellCmd '.g:vimchat_hiLinkShellCmd
 endif
 "}}}
 
@@ -40,7 +40,7 @@ endif
 if g:vimchat_highlightEmphasis
   syn match vimChatEmphasis '\*[^*]*\*' contains=vimChatAsterisk
   syn match vimChatAsterisk '\*' contained conceal
-  hi link vimChatEmphasis ErrorMsg
+  exe 'hi link vimChatEmphasis '.g:vimchat_hiLinkEmphasis
 endif
 ""}}}
 
@@ -59,34 +59,34 @@ endif
 " emoticons {{{
 if g:vimchat_highlightEmoticons
   exe 'syn match vimChatEmoticon /'.s:Or(s:EscapeRegex(s:emoticons)).'/'
-  hi link vimChatEmoticon Title
+  exe 'hi link vimChatEmoticon '.g:vimchat_hiLinkEmoticon
 endif
 "}}}
 
 " addressess {{{
 if g:vimchat_highlightAddresses
   syn match vimChatAddress /[^a-zA-Z0-9_-]\@<=@[a-zA-Z0-9_-]*\>/
-  hi link vimChatAddress SpecialKey
+  exe 'hi link vimChatAddress '.g:vimchat_hiLinkAddress
 endif
 "}}}
 
 " links {{{
 if g:vimchat_highlightLinks
   syn match vimChatLink /\s\@<=\(http[s]\?:\/\/\)\?[a-zA-Z0-9-_\.%]\+\.[a-z]\{2,10}\([?#\/%][^\t ]*\)\?\($\|\s\@=\)/
-  hi link vimChatLink		Underlined
+  exe 'hi link vimChatLink '.g:vimchat_hiLinkLink
 endif
 "}}}
 
 " paths {{{
 if g:vimchat_highlightPaths
   syn match vimChatPath /[^a-zA-Z0-9_\/-]\@<=\/[a-zA-Z0-9_@:-][*a-zA-Z0-9_@:\/-]*/
-  hi link vimChatPath Directory
+  exe 'hi link vimChatPath '.g:vimchat_hiLinkPath
 endif
 "}}}
 
 " mail and similar {{{
 if g:vimchat_highlightMail
   syn match vimChatMail /\<[a-zA-Z0-9_.-]\+@[a-zA-Z0-9_.-]\+\(:[^ \t]*\)\?/
-  hi link vimChatMail LineNr
+  exe 'hi link vimChatMail '.g:vimchat_hiLinkMail
 endif
 "}}}

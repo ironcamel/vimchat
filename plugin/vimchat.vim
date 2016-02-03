@@ -53,6 +53,20 @@
 "   g:vimchat_highlightLinks = (0 or 1) default 1
 "   g:vimchat_highlightPaths = (0 or 1) default 1
 "   g:vimchat_highlightMail = (0 or 1) default 1
+"   g:vimchat_hiLinkMsg = (string) default 'Comment'
+"   g:vimchat_hiLinkDateTime = (string) default 'String'
+"   g:vimchat_hiLinkDate = (string) default 'NonText'
+"   g:vimchat_hiLinkTime = (string) default 'Comment'
+"   g:vimchat_hiLinkMe = (string) default 'Type'
+"   g:vimchat_hiLinkShellCmd = (string) default 'Function'
+"   g:vimchat_hiLinkEmphasis = (string) default 'ErrorMsg'
+"   g:vimchat_hiLinkString1 = (string) default 'Identifier'
+"   g:vimchat_hiLinkString2 = (string) default 'Identifier'
+"   g:vimchat_hiLinkEmoticon = (string) default 'Title'
+"   g:vimchat_hiLinkAddress = (string) default 'SpecialKey'
+"   g:vimchat_hiLinkLink = (string) default 'Underlined'
+"   g:vimchat_hiLinkPath = (string) default 'Directory'
+"   g:vimchat_hiLinkMail = (string) default 'LineNr'
 "}}}
 
 " load only once {{{

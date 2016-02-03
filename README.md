@@ -143,6 +143,23 @@ You can can update your `~/.vimrc` with these settings to customize vimchat. All
 * let g:vimchat\_highlightPaths = (0 or 1) default 1
 * let g:vimchat\_highlightMail = (0 or 1) default 1
 
+
+* let g:vimchat\_hiLinkMsg = 'Comment'
+* let g:vimchat\_hiLinkDateTime = 'String'
+* let g:vimchat\_hiLinkDate = 'NonText'
+* let g:vimchat\_hiLinkTime = 'Comment'
+* let g:vimchat\_hiLinkMe = 'Type'
+* let g:vimchat\_hiLinkShellCmd = 'Function'
+* let g:vimchat\_hiLinkEmphasis = 'ErrorMsg'
+* let g:vimchat\_hiLinkString1 = 'Identifier'
+* let g:vimchat\_hiLinkString2 = 'Identifier'
+* let g:vimchat\_hiLinkEmoticon = 'Title'
+* let g:vimchat\_hiLinkAddress = 'SpecialKey'
+* let g:vimchat\_hiLinkLink = 'Underlined'
+* let g:vimchat\_hiLinkPath = 'Directory'
+* let g:vimchat\_hiLinkMail = 'LineNr'
+
+
 *Additional custom maps* can be defined, that will also load logs.
 
 * let g:vimchat\_pageup = (array of strings) default [], included besides `<C-b>` and `<PageUp>`
@@ -150,8 +167,6 @@ You can can update your `~/.vimrc` with these settings to customize vimchat. All
 * let g:vimchat\_moveup = (array of strings) default [], included besides `k` and `<Up>`
 * let g:vimchat\_moveleft = (array of strings) default [], included besides `h` and `<Left>`
                           
-
-
 # Contributing
 
 Pull requests are welcome. Please follow the pep 8 style guidelines for the python code.

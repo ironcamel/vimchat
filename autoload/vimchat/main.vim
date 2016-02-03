@@ -1769,6 +1769,48 @@ fu! vimchat#main#CheckVars() "{{{
     if !exists('g:vimchat_highlightMail')
       let g:vimchat_highlightMail = 1
     endif
+    if !exists('g:vimchat_hiLinkMsg')
+      let g:vimchat_hiLinkMsg = 'Comment'
+    endif
+    if !exists('g:vimchat_hiLinkDateTime')
+      let g:vimchat_hiLinkDateTime = 'String'
+    endif
+    if !exists('g:vimchat_hiLinkDate')
+      let g:vimchat_hiLinkDate = 'NonText'
+    endif
+    if !exists('g:vimchat_hiLinkTime')
+      let g:vimchat_hiLinkTime = 'Comment'
+    endif
+    if !exists('g:vimchat_hiLinkMe')
+      let g:vimchat_hiLinkMe = 'Type'
+    endif
+    if !exists('g:vimchat_hiLinkShellCmd')
+      let g:vimchat_hiLinkShellCmd = 'Function'
+    endif
+    if !exists('g:vimchat_hiLinkEmphasis')
+      let g:vimchat_hiLinkEmphasis = 'ErrorMsg'
+    endif
+    if !exists('g:vimchat_hiLinkString')
+      let g:vimchat_hiLinkString1 = 'Identifier'
+    endif
+    if !exists('g:vimchat_hiLinkString')
+      let g:vimchat_hiLinkString2 = 'Identifier'
+    endif
+    if !exists('g:vimchat_hiLinkEmoticon')
+      let g:vimchat_hiLinkEmoticon = 'Title'
+    endif
+    if !exists('g:vimchat_hiLinkAddress')
+      let g:vimchat_hiLinkAddress = 'SpecialKey'
+    endif
+    if !exists('g:vimchat_hiLinkLink')
+      let g:vimchat_hiLinkLink = 'Underlined'
+    endif
+    if !exists('g:vimchat_hiLinkPath')
+      let g:vimchat_hiLinkPath = 'Directory'
+    endif
+    if !exists('g:vimchat_hiLinkMail')
+      let g:vimchat_hiLinkMail = 'LineNr'
+    endif
     return 1
 endfu "}}}
 
