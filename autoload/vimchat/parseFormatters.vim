@@ -65,7 +65,7 @@ func! s:GetDateTimeRegex(dateFormat, timeFormat) abort "{{{
   let timeRegex = vimchat#parseFormatters#GetDatelikeRegex(a:timeFormat)
   let pattern = join(enclosers,
         \            join(['\('.dateRegex.' *\)\?', timeRegex],
-        \                 ' '))
+        \                 ''))
   return pattern
 endfunc "}}}
 
