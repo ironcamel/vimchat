@@ -331,16 +331,3 @@ func! s:OpenLink(text) "{{{
     endif
   endif
 endfunc "}}}
-
-" vimchat global commands {{{
-com! VimChatStop py VimChat.stop()
-com! VimChatBuddyList py VimChat.toggleBuddyList()
-com! VimChatViewLog py VimChat.openLogFromChat()
-com! VimChatJoinGroupChat py VimChat.openGroupChat()
-com! VimChatOtrVerifyBuddy py VimChat.otrVerifyBuddy()
-com! VimChatOtrSMPRespond py VimChat.otrSmpRespond()
-com! VimChatOtrGenerateKey py VimChat.otrGenerateKey()
-com! -nargs=0 VimChatSetStatus py VimChat.setStatus(<args>)
-com! VimChatShowStatus py VimChat.showStatus()
-com! VimChatJoinChatroom py VimChat.joinChatroom()
-" }}}
