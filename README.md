@@ -130,18 +130,18 @@ You can can update your `~/.vimrc` with these settings to customize vimchat. All
 * let g:vimchat\_dateformat = format of the message date in logs, default "[%Y-%m-%d]" 
 * let g:vimchat\_showPresenceNotification = notification if buddy changed status, comma-separated list of states, default ""
 * let g:vimchat\_load\_logs = (0 or 1) default is 1 -- reload logs from previous conversations when scrolling or moving beyond line 1
-* let g:vimchat\_extended\_highlighting = (0 or 1) default is 0 -- some syntax highlighting in text
+* let g:vimchat\_extendedHighlighting = (0 or 1) default is 0 -- some syntax highlighting in text
 
 *Extended highlighting*, if activated, can be further customized by setting these variables:
 
-* let g:vimchat\_highlight\_emoticons = (0 or 1) default 1
-* let g:vimchat\_highlight\_shellcmds = (0 or 1) default 1
-* let g:vimchat\_highlight\_emphasis = (0 or 1) default 1
-* let g:vimchat\_highlight\_strings = (0 or 1) default 1
-* let g:vimchat\_highlight\_addresses = (0 or 1) default 1
-* let g:vimchat\_highlight\_links = (0 or 1) default 1
-* let g:vimchat\_highlight\_paths = (0 or 1) default 1
-* let g:vimchat\_highlight\_mail = (0 or 1) default 1
+* let g:vimchat\_highlightEmoticons = (0 or 1) default 1
+* let g:vimchat\_highlightShellcmds = (0 or 1) default 1
+* let g:vimchat\_highlightEmphasis = (0 or 1) default 1
+* let g:vimchat\_highlightStrings = (0 or 1) default 1
+* let g:vimchat\_highlightAddresses = (0 or 1) default 1
+* let g:vimchat\_highlightLinks = (0 or 1) default 1
+* let g:vimchat\_highlightPaths = (0 or 1) default 1
+* let g:vimchat\_highlightMail = (0 or 1) default 1
 
 *Additional custom maps* can be defined, that will also load logs.
 

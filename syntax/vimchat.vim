@@ -27,17 +27,17 @@ hi link vimChatTime		Comment
 hi link vimChatMe		Type
 "}}}
 
-if !g:vimchat_extended_highlighting | finish | endif
+if !g:vimchat_extendedHighlighting | finish | endif
 
 " shell commands {{{
-if g:vimchat_highlight_shellcmds
+if g:vimchat_highlightShellcmds
   exe 'syn match vimChatShellCmd /[ (]\@<='.s:Or(s:bashCmds).'\>/'
   hi link vimChatShellCmd Function
 endif
 "}}}
 
 " emphasis {{{
-if g:vimchat_highlight_emphasis
+if g:vimchat_highlightEmphasis
   syn match vimChatEmphasis '\*[^*]*\*' contains=vimChatAsterisk
   syn match vimChatAsterisk '\*' contained conceal
   hi link vimChatEmphasis ErrorMsg
@@ -45,7 +45,7 @@ endif
 ""}}}
 
 " strings {{{
-if g:vimchat_highlight_strings
+if g:vimchat_highlightStrings
   syn match vimChatString1 "'[^']*'" contains=vimChatApostrophe1
   syn match vimChatApostrophe1 "'" contained conceal
   hi link vimChatString1 Identifier
@@ -57,35 +57,35 @@ endif
 ""}}}
 
 " emoticons {{{
-if g:vimchat_highlight_emoticons
+if g:vimchat_highlightEmoticons
   exe 'syn match vimChatEmoticon /'.s:Or(s:EscapeRegex(s:emoticons)).'/'
   hi link vimChatEmoticon Title
 endif
 "}}}
 
 " addressess {{{
-if g:vimchat_highlight_addresses
+if g:vimchat_highlightAddresses
   syn match vimChatAddress /[^a-zA-Z0-9_-]\@<=@[a-zA-Z0-9_-]*\>/
   hi link vimChatAddress SpecialKey
 endif
 "}}}
 
 " links {{{
-if g:vimchat_highlight_links
+if g:vimchat_highlightLinks
   syn match vimChatLink /\s\@<=\(http[s]\?:\/\/\)\?[a-zA-Z0-9-_\.%]\+\.[a-z]\{2,10}\([?#\/%][^\t ]*\)\?\($\|\s\@=\)/
   hi link vimChatLink		Underlined
 endif
 "}}}
 
 " paths {{{
-if g:vimchat_highlight_paths
+if g:vimchat_highlightPaths
   syn match vimChatPath /[^a-zA-Z0-9_\/-]\@<=\/[a-zA-Z0-9_@:-][*a-zA-Z0-9_@:\/-]*/
   hi link vimChatPath Directory
 endif
 "}}}
 
 " mail and similar {{{
-if g:vimchat_highlight_mail
+if g:vimchat_highlightMail
   syn match vimChatMail /\<[a-zA-Z0-9_.-]\+@[a-zA-Z0-9_.-]\+\(:[^ \t]*\)\?/
   hi link vimChatMail LineNr
 endif

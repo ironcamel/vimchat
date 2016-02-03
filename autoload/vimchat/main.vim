@@ -1742,32 +1742,32 @@ fu! vimchat#main#CheckVars() "{{{
     if !exists('g:vimchat_browser_in_bg')
       let g:vimchat_browser_in_bg = 1
     endif
-    if !exists('g:vimchat_extended_highlighting')
-      let g:vimchat_extended_highlighting = 0
+    if !exists('g:vimchat_extendedHighlighting')
+      let g:vimchat_extendedHighlighting = 0
     endif
-    if !exists('g:vimchat_highlight_emoticons')
-      let g:vimchat_highlight_emoticons = 1
+    if !exists('g:vimchat_highlightEmoticons')
+      let g:vimchat_highlightEmoticons = 1
     endif
-    if !exists('g:vimchat_highlight_shellcmds')
-      let g:vimchat_highlight_shellcmds = 1
+    if !exists('g:vimchat_highlightShellcmds')
+      let g:vimchat_highlightShellcmds = 1
     endif
-    if !exists('g:vimchat_highlight_emphasis')
-      let g:vimchat_highlight_emphasis = 1
+    if !exists('g:vimchat_highlightEmphasis')
+      let g:vimchat_highlightEmphasis = 1
     endif
-    if !exists('g:vimchat_highlight_strings')
-      let g:vimchat_highlight_strings = 1
+    if !exists('g:vimchat_highlightStrings')
+      let g:vimchat_highlightStrings = 1
     endif
-    if !exists('g:vimchat_highlight_addresses')
-      let g:vimchat_highlight_addresses = 1
+    if !exists('g:vimchat_highlightAddresses')
+      let g:vimchat_highlightAddresses = 1
     endif
-    if !exists('g:vimchat_highlight_links')
-      let g:vimchat_highlight_links = 1
+    if !exists('g:vimchat_highlightLinks')
+      let g:vimchat_highlightLinks = 1
     endif
-    if !exists('g:vimchat_highlight_paths')
-      let g:vimchat_highlight_paths = 1
+    if !exists('g:vimchat_highlightPaths')
+      let g:vimchat_highlightPaths = 1
     endif
-    if !exists('g:vimchat_highlight_mail')
-      let g:vimchat_highlight_mail = 1
+    if !exists('g:vimchat_highlightMail')
+      let g:vimchat_highlightMail = 1
     endif
     return 1
 endfu "}}}

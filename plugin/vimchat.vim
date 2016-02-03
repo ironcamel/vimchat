@@ -42,17 +42,17 @@
 "                        or array of strings) default []
 "   g:vimchat_openlink = map for 'open link in browser' default is '<C-]>'
 "   g:vimchat_browser_in_bg = (0 or 1) default is 1
-"   g:vimchat_extended_highlighting = switch extended highlighting globally on
+"   g:vimchat_extendedHighlighting = switch extended highlighting globally on
 "                                     or off
 "                                     (0 or 1) default 0
-"   g:vimchat_highlight_emoticons = (0 or 1) default 1
-"   g:vimchat_highlight_shellcmds = (0 or 1) default 1
-"   g:vimchat_highlight_emphasis = (0 or 1) default 1
-"   g:vimchat_highlight_strings = (0 or 1) default 1
-"   g:vimchat_highlight_addresses = (0 or 1) default 1
-"   g:vimchat_highlight_links = (0 or 1) default 1
-"   g:vimchat_highlight_paths = (0 or 1) default 1
-"   g:vimchat_highlight_mail = (0 or 1) default 1
+"   g:vimchat_highlightEmoticons = (0 or 1) default 1
+"   g:vimchat_highlightShellcmds = (0 or 1) default 1
+"   g:vimchat_highlightEmphasis = (0 or 1) default 1
+"   g:vimchat_highlightStrings = (0 or 1) default 1
+"   g:vimchat_highlightAddresses = (0 or 1) default 1
+"   g:vimchat_highlightLinks = (0 or 1) default 1
+"   g:vimchat_highlightPaths = (0 or 1) default 1
+"   g:vimchat_highlightMail = (0 or 1) default 1
 "}}}
 
 " load only once {{{
