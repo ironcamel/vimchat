@@ -95,6 +95,10 @@ To send multiple lines, select the lines in visual mode and then hit enter.
 Typing `<leader>l` will bring up a new tab containing log files for the current
 user. 
 
+When moving up beyond the first line, the most recent logs will be prepended if found.
+
+The user can enable extended syntax highlighting (urls, emoticons, ...) at wish.
+
 # Chat Rooms
 
 You can configure chat rooms in your vimchat config file.
@@ -123,8 +127,46 @@ You can can update your `~/.vimrc` with these settings to customize vimchat. All
 * let g:vimchat\_blinktimeout = timeout in seconds, default is -1
 * let g:vimchat\_buddylistmaxwidth = max width of buddy list window, default ''
 * let g:vimchat\_timestampformat = format of the message timestamp, default "[%H:%M]" 
+* let g:vimchat\_dateformat = format of the message date in logs, default "[%Y-%m-%d]" 
 * let g:vimchat\_showPresenceNotification = notification if buddy changed status, comma-separated list of states, default ""
+* let g:vimchat\_loadLogs = (0 or 1) default is 1 -- reload logs from previous conversations when scrolling or moving beyond line 1
+* let g:vimchat\_extendedHighlighting = (0 or 1) default is 0 -- some syntax highlighting in text
 
+*Extended highlighting*, if activated, can be further customized by setting these variables:
+
+* let g:vimchat\_highlightEmoticons = (0 or 1) default 1
+* let g:vimchat\_highlightShellcmds = (0 or 1) default 1
+* let g:vimchat\_highlightEmphasis = (0 or 1) default 1
+* let g:vimchat\_highlightStrings = (0 or 1) default 1
+* let g:vimchat\_highlightAddresses = (0 or 1) default 1
+* let g:vimchat\_highlightLinks = (0 or 1) default 1
+* let g:vimchat\_highlightPaths = (0 or 1) default 1
+* let g:vimchat\_highlightMail = (0 or 1) default 1
+
+
+* let g:vimchat\_hiLinkMsg = 'Comment'
+* let g:vimchat\_hiLinkDateTime = 'String'
+* let g:vimchat\_hiLinkDate = 'NonText'
+* let g:vimchat\_hiLinkTime = 'Comment'
+* let g:vimchat\_hiLinkMe = 'Type'
+* let g:vimchat\_hiLinkShellCmd = 'Function'
+* let g:vimchat\_hiLinkEmphasis = 'ErrorMsg'
+* let g:vimchat\_hiLinkString1 = 'Identifier'
+* let g:vimchat\_hiLinkString2 = 'Identifier'
+* let g:vimchat\_hiLinkEmoticon = 'Title'
+* let g:vimchat\_hiLinkAddress = 'SpecialKey'
+* let g:vimchat\_hiLinkLink = 'Underlined'
+* let g:vimchat\_hiLinkPath = 'Directory'
+* let g:vimchat\_hiLinkMail = 'LineNr'
+
+
+*Additional custom maps* can be defined, that will also load logs.
+
+* let g:vimchat\_pageup = (array of strings) default [], included besides `<C-b>` and `<PageUp>`
+* let g:vimchat\_halfpageup = (array of strings) default [], included besides `<C-u>`
+* let g:vimchat\_moveup = (array of strings) default [], included besides `k` and `<Up>`
+* let g:vimchat\_moveleft = (array of strings) default [], included besides `h` and `<Left>`
+                          
 # Contributing
 
 Pull requests are welcome. Please follow the pep 8 style guidelines for the python code.
@@ -135,3 +177,4 @@ Pull requests are welcome. Please follow the pep 8 style guidelines for the pyth
 * Michael Dillon [michaelcdillon](https://github.com/michaelcdillon)
 * Naveed Massjouni [ironcamel](https://github.com/ironcamel) (author)
 * William Wolf [throughnothing](https://github.com/throughnothing) (author)
+* Lars Winderling [kaHaleMaKai](https://github.com/kaHaleMaKai)
