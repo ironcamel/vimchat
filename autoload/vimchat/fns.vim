@@ -9,8 +9,7 @@ let s:startTime = reltime()[0]
 
 " script local definitions {{{
 let s:offsetMap = {}
-" TODO: get width of timestamp from dynamic pattern or first line of read file
-let s:spaces =  repeat(' ', 19)
+let s:defaultLineIndent = repeat(' ', 19)
 let s:scrollTypes = {'line': 0, 'page': 1, 'column': 2}
 let s:separator = [
       \ '',
@@ -90,8 +89,13 @@ func! s:GetProtocolPath(offset) "{{{
   return join([s:GetProtocolDir(), chatPartner], '/').'-'.date
 endfunc "}}}
 
-func! s:GetLinePattern(enclosers, timePattern) abort "{{{
-  let pattern = '^\('.a:enclosers[0].'\)\('.a:timePattern.'\)\('.a:enclosers[1].'\)'
+func! s:GetLinePattern(enclosers, pattern, ...) abort "{{{
+  if !a:0
+    let pattern = '^\('.a:enclosers[0].'\)\('.a:pattern.'\)\('.a:enclosers[1].'\)'
+  else
+    let otherPattern = a:1
+    let pattern = '^\('.a:enclosers[0].'\)\('.a:pattern.' '.otherPattern.'\)\('.a:enclosers[1].'\)'
+  endif
   return pattern
 endfunc "}}}
 
@@ -100,20 +104,32 @@ func! s:GetReplacement(date) abort "{{{
   return subst
 endfunc "}}}
 
+func! s:IndentLine() abort "{{{
+  let localIndent = get(b:, 'vimChatLineIndent', '')
+  return localIndent != '' ? localIndent : s:defaultLineIndent
+endfunc "}}}
+
 func! s:ProcessLine(line, date) "{{{
   if a:date != s:GetDate(0)
     let dateFormat = vimchat#parseFormatters#RemoveEnclosers(get(g:, 'vimchat_dateformat', '%F'))
     let date = vimchat#fns#ConvertIsoDate(a:date, dateFormat)
+    let datePattern = vimchat#parseFormatters#GetDatelikeRegex(g:vimchat_dateformat)
     let timePattern = vimchat#parseFormatters#GetDatelikeRegex(g:vimchat_timestampformat)
     let enclosers = vimchat#parseFormatters#GetEnclosers(g:vimchat_timestampformat)
     let subst = join(enclosers, timePattern)
     let pattern = s:GetLinePattern(enclosers, timePattern)
     let subst = s:GetReplacement(date)
     let line = substitute(a:line, pattern, subst, '')
+
+    if !exists('b:vimChatLineIndent')
+      let fullPattern = s:GetLinePattern(enclosers, datePattern, timePattern)
+      let numSpaces = matchend(line, fullPattern) + 1
+      let b:vimChatLineIndent = repeat(' ', numSpaces)
+    endif
   else
     let line = a:line
   endif
-  return substitute(line, '^\t', s:spaces, '')
+  return substitute(line, '^\t', s:IndentLine(), '')
 endfunc "}}}
 
 func! s:PrependProtocol(path, date) "{{{
