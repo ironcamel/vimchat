@@ -177,3 +177,4 @@ Pull requests are welcome. Please follow the pep 8 style guidelines for the pyth
 * Michael Dillon [michaelcdillon](https://github.com/michaelcdillon)
 * Naveed Massjouni [ironcamel](https://github.com/ironcamel) (author)
 * William Wolf [throughnothing](https://github.com/throughnothing) (author)
+* Lars Winderling [kaHaleMaKai](https://github.com/kaHaleMaKai)
