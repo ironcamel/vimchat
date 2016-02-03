@@ -9,7 +9,9 @@ let s:startTime = reltime()[0]
 
 " script local definitions {{{
 let s:offsetMap = {}
-let s:spaces =  '                   '
+" TODO: get width of timestamp from dynamic pattern or first line of read file
+let s:spaces =  repeat(' ', 19)
+let s:scrollTypes = {'line': 0, 'page': 1, 'column': 2}
 let s:separator = [
       \ '',
       \ '----------------------------------------------------------',
@@ -170,10 +172,11 @@ func! s:PrependProtocolFromList(...) "{{{
   endif
 endfunc "}}}
 
-func! s:HasReachedTheTop() "{{{
-  let curLine = line('.')
+func! s:HasReachedTheTop(...) "{{{
+  let amount = (a:0 ? a:1 : 1) - 1
+  let curLine = line('.') - amount
   let winLine = winline()
-  let ret = winLine != curLine
+  let ret = winLine >= curLine
   if !ret
     let ret = curLine <= winheight('.')
   endif
@@ -191,7 +194,41 @@ func! s:GetNextOffset() "{{{
   return offset
 endfunc "}}}
 
-func! s:ScrollUp() "{{{
+func! s:GetNumberOfCharsInFrontOfCursor() abort "{{{
+  let lines = getline(1, '.')
+  let pos = col('.') - 1
+  let lines[-1] = lines[-1][:pos]
+  let nr = 0
+  for line in lines
+    let nr += len(line)
+  endfor
+  return (nr - 1)
+endfunc "}}}
+
+func! s:ScrollUp(scrollType, amount) abort "{{{
+  if a:scrollType == s:scrollTypes.line
+    if s:HasReachedTheTop(a:amount - 1)
+      call s:PrependProtocolFromList(s:GetNextOffset())
+    endif
+    let ret = a:amount.''
+  elseif a:scrollType == s:scrollTypes.page
+    if s:HasReachedTheTop()
+      call s:PrependProtocolFromList(s:GetNextOffset())
+    endif
+    let ret = a:amount.''
+  elseif a:scrollType == s:scrollTypes.column
+    if a:amount > s:GetNumberOfCharsInFrontOfCursor()
+      call s:PrependProtocolFromList(s:GetNextOffset())
+    endif
+    let ret = a:amount.'h'
+  else
+    let ret = '<Nop>'
+    echoerr 'wrong kind of scrolling type: "'.a:scrollType.'"'
+  endif
+  exe 'normal! '.ret
+endfunc "}}}
+
+func! s:MovePageUp() "{{{
   if s:HasReachedTheTop()
     call s:PrependProtocolFromList(s:GetNextOffset())
   endif
@@ -206,7 +243,13 @@ func! s:MoveUp(...) "{{{
   exe 'normal! '.command
 endfunc "}}}
 
+func! s:AsArray(arg) abort "{{{
+  return type(a:arg) == type([]) ? a:arg : [a:arg]
+endfunc "}}}
+
+
 func! vimchat#fns#SetupLocalMapsAndCommands() "{{{
+  " always defined commands {{{
   command!
         \ -nargs=?
         \ -buffer
@@ -220,14 +263,33 @@ func! vimchat#fns#SetupLocalMapsAndCommands() "{{{
         \ :call <sid>PrependProtocolByDate(<f-args>)
 
   call s:DefineStateCommands()
+  "}}}
 
-  if !get(g:, 'vimchat_scrolling', 1) | return | endif
+  if !g:vimchat_load_logs | return | endif
 
-  exe 'nnoremap <silent> <buffer> '.g:vimchat_scrollup.' :call '.'<sid>ScrollUp()<CR>'
-  exe 'nnoremap <silent> <buffer> '.g:vimchat_scrollhalfwayup.' :call <sid>MoveUp()<CR>'
-  exe 'nnoremap <silent> <buffer> '.g:vimchat_moveup.' :call <sid>MoveUp("k")<CR>'
+  " optional commands {{{
+
+  for map_ in ['<C-b>', '<PageUp>'] + s:AsArray(g:vimchat_pageup)
+    exe 'nnoremap <silent> <buffer> '.map_.' :call '.'<sid>MovePageUp()<CR>'
+  endfor
+
+  for map_ in ['<C-u>'] + s:AsArray(g:vimchat_halfpageup)
+    exe 'nnoremap <silent> <buffer> '.map_.' :call <sid>MoveUp()<CR>'
+  endfor
+  for map_ in ['k', '<Up>'] + s:AsArray(g:vimchat_moveup)
+    exe 'nnoremap <silent> <buffer> '.map_.' :call <sid>MoveUp("k")<CR>'
+  endfor
+
+  exe 'nnoremap <silent> <buffer> <C-y> :call <sid>ScrollUp('.s:scrollTypes.line.', 1)<CR>'
+  exe 'nnoremap <silent> <buffer> <ScrollWheelUp> :call <sid>ScrollUp('.s:scrollTypes.line.', 3)<CR>'
+  exe 'nnoremap <silent> <buffer> <C-ScrollWheelUp> :call <sid>ScrollUp('.s:scrollTypes.page.', 1)<CR>'
+  for map_ in ['h', '<Left>', 'ScrollWheelLeft'] + s:AsArray(g:vimchat_moveleft)
+    exe 'nnoremap <silent> <buffer> '.map_.' :call <sid>ScrollUp('.s:scrollTypes.column.', 1)<CR>'
+  endfor
+
   exe 'nnoremap <silent> <buffer> '.g:vimchat_openlink.' :call <SID>OpenLink(expand("<cWORD>"))<CR>'
 
+  "}}}
 endfunc "}}}
 
 func! s:IsLink(text) "{{{

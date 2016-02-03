@@ -30,14 +30,21 @@
 "   g:vimchat_timestampformat = format of the msg timestamp default "[%H:%M]"
 "   g:vimchat_dateformat = format of the msg date for logs default "[%Y-%m-%d]"
 "   g:vimchat_showPresenceNotification = notify if buddy changed status default ""
-"   g:vimchat_scrollup = map for 'scroll one screen up' default is '<C-b>'
-"   g:vimchat_scrollhalfwayup = map for 'scroll half screen up' default is <C-u>'
-"   g:vimchat_moveup = map for 'move one line up' default is 'k'
-"   g:vimchat_scrolling = (0 or 1) default is 1
+"   g:vimchat_load_logs = load log file when scrolling/moving beyond line 0
+"                         (0 or 1) default is 1
+"   g:vimchat_pageup = custom map(s) for page up (array of strings)
+"                      default []
+"   g:vimchat_halfpageup = custom map(s) for half page up (array
+"                          or strings) default []
+"   g:vimchat_moveup = custom additional map(s) for move line up (String or
+"                      array of strings) default []
+"   g:vimchat_moveleft = custom additional map(s) for move char left up (String
+"                        or array of strings) default []
 "   g:vimchat_openlink = map for 'open link in browser' default is '<C-]>'
 "   g:vimchat_browser_in_bg = (0 or 1) default is 1
 "   g:vimchat_extended_highlighting = switch extended highlighting globally on
-"                                     or off(0 or 1) default 0
+"                                     or off
+"                                     (0 or 1) default 0
 "   g:vimchat_highlight_emoticons = (0 or 1) default 1
 "   g:vimchat_highlight_shellcmds = (0 or 1) default 1
 "   g:vimchat_highlight_emphasis = (0 or 1) default 1

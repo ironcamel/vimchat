@@ -1706,14 +1706,17 @@ fu! vimchat#main#CheckVars() "{{{
     if !exists('g:vimchat_showPresenceNotification')
         let g:vimchat_showPresenceNotification=""
     endif
-    if !exists('g:vimchat_scrollup')
-        let g:vimchat_scrollup = '<C-b>'
+    if !exists('g:vimchat_pageup')
+        let g:vimchat_pageup = []
     endif
-    if !exists('g:vimchat_scrollhalfwayup')
-        let g:vimchat_scrollhalfwayup = '<C-u>'
+    if !exists('g:vimchat_halfpageup')
+        let g:vimchat_halfpageup = []
     endif
     if !exists('g:vimchat_moveup')
-        let g:vimchat_moveup = 'k'
+        let g:vimchat_moveup = []
+    endif
+    if !exists('g:vimchat_moveleft')
+        let g:vimchat_moveleft = []
     endif
     if !exists('g:vimchat_on_cmd')
       let g:vimchat_on_cmd = 'on'
@@ -1727,8 +1730,8 @@ fu! vimchat#main#CheckVars() "{{{
     if !exists('g:vimchat_dnd_cmd')
       let g:vimchat_dnd_cmd = 'dnd'
     endif
-    if !exists('g:vimchat_scrolling')
-      let g:vimchat_scrolling = 1
+    if !exists('g:vimchat_load_logs')
+      let g:vimchat_load_logs = 1
     endif
     if !exists('g:vimchat_openlink')
       let g:vimchat_openlink = '<C-]>'

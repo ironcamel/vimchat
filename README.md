@@ -129,7 +129,7 @@ You can can update your `~/.vimrc` with these settings to customize vimchat. All
 * let g:vimchat\_timestampformat = format of the message timestamp, default "[%H:%M]" 
 * let g:vimchat\_dateformat = format of the message date in logs, default "[%Y-%m-%d]" 
 * let g:vimchat\_showPresenceNotification = notification if buddy changed status, comma-separated list of states, default ""
-* let g:vimchat\_scrolling = (0 or 1) default is 1 -- reload logs from previous conversations when scrolling beyong line 1
+* let g:vimchat\_load\_logs = (0 or 1) default is 1 -- reload logs from previous conversations when scrolling or moving beyond line 1
 * let g:vimchat\_extended\_highlighting = (0 or 1) default is 0 -- some syntax highlighting in text
 
 *Extended highlighting*, if activated, can be further customized by setting these variables:
@@ -142,6 +142,15 @@ You can can update your `~/.vimrc` with these settings to customize vimchat. All
 * let g:vimchat\_highlight\_links = (0 or 1) default 1
 * let g:vimchat\_highlight\_paths = (0 or 1) default 1
 * let g:vimchat\_highlight\_mail = (0 or 1) default 1
+
+*Additional custom maps* can be defined, that will also load logs.
+
+* let g:vimchat\_pageup = (array of strings) default [], included besides `<C-b>` and `<PageUp>`
+* let g:vimchat\_halfpageup = (array of strings) default [], included besides `<C-u>`
+* let g:vimchat\_moveup = (array of strings) default [], included besides `k` and `<Up>`
+* let g:vimchat\_moveleft = (array of strings) default [], included besides `h` and `<Left>`
+                          
+
 
 # Contributing
 
