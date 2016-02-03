@@ -129,7 +129,7 @@ You can can update your `~/.vimrc` with these settings to customize vimchat. All
 * let g:vimchat\_timestampformat = format of the message timestamp, default "[%H:%M]" 
 * let g:vimchat\_dateformat = format of the message date in logs, default "[%Y-%m-%d]" 
 * let g:vimchat\_showPresenceNotification = notification if buddy changed status, comma-separated list of states, default ""
-* let g:vimchat\_load\_logs = (0 or 1) default is 1 -- reload logs from previous conversations when scrolling or moving beyond line 1
+* let g:vimchat\_loadLogs = (0 or 1) default is 1 -- reload logs from previous conversations when scrolling or moving beyond line 1
 * let g:vimchat\_extendedHighlighting = (0 or 1) default is 0 -- some syntax highlighting in text
 
 *Extended highlighting*, if activated, can be further customized by setting these variables:

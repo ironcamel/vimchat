@@ -1730,8 +1730,8 @@ fu! vimchat#main#CheckVars() "{{{
     if !exists('g:vimchat_dnd_cmd')
       let g:vimchat_dnd_cmd = 'dnd'
     endif
-    if !exists('g:vimchat_load_logs')
-      let g:vimchat_load_logs = 1
+    if !exists('g:vimchat_loadLogs')
+      let g:vimchat_loadLogs = 1
     endif
     if !exists('g:vimchat_openlink')
       let g:vimchat_openlink = '<C-]>'

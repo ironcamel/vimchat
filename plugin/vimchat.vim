@@ -30,7 +30,7 @@
 "   g:vimchat_timestampformat = format of the msg timestamp default "[%H:%M]"
 "   g:vimchat_dateformat = format of the msg date for logs default "[%Y-%m-%d]"
 "   g:vimchat_showPresenceNotification = notify if buddy changed status default ""
-"   g:vimchat_load_logs = load log file when scrolling/moving beyond line 0
+"   g:vimchat_loadLogs = load log file when scrolling/moving beyond line 0
 "                         (0 or 1) default is 1
 "   g:vimchat_pageup = custom map(s) for page up (array of strings)
 "                      default []

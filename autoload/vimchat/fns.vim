@@ -281,7 +281,7 @@ func! vimchat#fns#SetupLocalMapsAndCommands() "{{{
   call s:DefineStateCommands()
   "}}}
 
-  if !g:vimchat_load_logs | return | endif
+  if !g:vimchat_loadLogs | return | endif
 
   " optional commands {{{
 
